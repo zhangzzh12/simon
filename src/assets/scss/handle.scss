@@ -1,0 +1,38 @@
+@import "./themes.scss";
+
+@mixin themeify {
+    @each $theme-name, $theme-map in $themes{
+        $theme-map:$theme-map !global;
+        [data-theme="#{$theme-name}"] & {
+            @content;
+        }
+    }
+}
+
+@function themed($key){
+    @return map-get($theme-map,$key);
+}
+
+@mixin font_color($color){
+    @include themeify{
+        color: themed($color) !important;
+    }
+}
+
+@mixin background_color($color){
+    @include themeify{
+        background-color: themed($color) !important;
+    }
+}
+
+@mixin border_color($color){
+    @include themeify{
+        border-color: themed($color) !important;
+    }
+}
+
+@mixin accent_color($color){
+    @include themeify{
+        accent-color: themed($color) !important;
+    }
+}

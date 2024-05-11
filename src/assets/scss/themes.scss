@@ -1,0 +1,26 @@
+$themes: (
+    light:(
+        primary-100:#FFD700,
+        primary-200:#ddb900,
+        primary-300:#917800,
+        accent-100:#B8860B,
+        accent-200:#543000,
+        text-100:#000000,
+        text-200:#2c2c2c,
+        bg-100:#F9E4AD,
+        bg-200:#eedaa3,
+        bg-300:#c5b27d,
+    ),
+    dark:(
+        primary-100:#FFD700,
+        primary-200:#ddb900,
+        primary-300:#917800,
+        accent-100:#c49216,
+        accent-200:#5e3b00,
+        text-100:#dcdcdc,
+        text-200:#929292,
+        bg-100:#1E1E1E,
+        bg-200:#2d2d2d,
+        bg-300:#454545,
+    ),
+)
