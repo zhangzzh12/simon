@@ -6,7 +6,7 @@ const registerLink = () => {
     isactive.value = !isactive.value;
 };
 //验证码
-let show_num:number[]|number[] = [];
+let show_num:number[] = [];
 let value = '';
 function sublim() {
     let num = show_num.join("");
@@ -43,7 +43,7 @@ function getCode() {
 
     return [...lowercaseAlphabet, ...uppercaseAlphabet, ...numsZeroToNine]
 }
-function draw(show_num:string[]|number[], codeLength = 6) { // codeLength: 设置验证码长度
+function draw(show_num:string[]|number[], codeLength = 4) { // codeLength: 设置验证码长度
     let canvas = document.getElementById("canvas");//获取到canvas的对象，演员
     let context = canvas!.getContext("2d");//获取到canvas画图的环境，演员表演的舞台
     let canvas_width = canvas!.width;
@@ -101,11 +101,11 @@ function randomColor() {
     return "rgb(" + r + "," + g + "," + b + ")";
 }
 function dj() {
-    draw(show_num,6);
+    draw(show_num,4);
 }
 onMounted(() => {
     show_num = [];
-    draw(show_num,6);
+    draw(show_num,4);
 }
 );
 
@@ -211,7 +211,7 @@ const closeVerify = (index:number) => {
                 <div class="input-box">
                     <i class='bx bxs-envelope'></i>
                     <input type="text" required>
-                    <label>邮箱</label>
+                    <label>用户名</label>
                 </div>
                 <div class="input-box">
                     <i class='bx bxs-lock-alt'></i>
@@ -219,7 +219,7 @@ const closeVerify = (index:number) => {
                     <label>密码</label>
                 </div>
                 <div class="input-box code">
-                    <input type="text" required v-model=value maxlength="6">
+                    <input type="text" required v-model=value maxlength="4">
                     <div id="code-btn" onclick="">
                         <canvas id="canvas" @click="dj()"></canvas>
                     </div>
@@ -227,14 +227,10 @@ const closeVerify = (index:number) => {
                 </div>
                 <div class="remember-forgot">
                     <label><input type="checkbox">记住密码</label>
-                    <RouterLink to="/forget">忘记密码</RouterLink>
                 </div>
-                <button type="submit" class="btn" @click="sublim()">LOGIN</button>
+                <button type="submit" class="btn" @click="sublim()">登录</button>
                 <div class="login-register">
-                    <p>
-                        <RouterLink to="/phone">电话验证登录</RouterLink>
-                    </p>
-                    <span>还没有一个账户？<a href="#" @click="registerLink">注册</a></span>
+                    <span>还没有一个账户？<a href="#" @click="registerLink">去注册</a></span>
                 </div>
             </form>
         </div>
@@ -288,7 +284,7 @@ const closeVerify = (index:number) => {
                 <div class="remember-forgot">
                     <label><input type="checkbox">同意相关条款</label>
                 </div>
-                <button type="submit" class="btn">sign up</button>
+                <button type="submit" class="btn">注册</button>
                 <div class="login-register">
                     <span>已经拥有账户?<a href="#" class="login-link" @click="registerLink">去登陆</a></span>
                 </div>
@@ -376,7 +372,7 @@ const closeVerify = (index:number) => {
             input {
                 width: 100%;
                 height: 100%;
-                background: transpareb;
+                background: transparent;
                 border: none;
                 outline: none;
                 @include font_color('text-100');
@@ -415,7 +411,7 @@ const closeVerify = (index:number) => {
                 }
 
                 #code-btn {
-                    width: 60%;
+                    width: 40%;
                     padding: 0;
                     outline: none;
                     background-color: transparent;

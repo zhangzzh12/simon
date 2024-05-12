@@ -26,7 +26,7 @@ let nav_menu_list = [
 <template>
     <div class="login-main" :class=themeStyle.model>
         <header>
-            <div class="logo">哈大饼</div>
+            <div class="logo">西蒙软创</div>
             <nav>
                 <ul class="menu">
                     <li v-for="value in nav_menu_list" :key="value.id">
@@ -44,8 +44,8 @@ let nav_menu_list = [
         <main>
             <section class="home">
                 <div class="home-content">
-                    <h1>"哈大饼"<br>外卖配送</h1>
-                    <p>美味外送<br>尽在指尖间<br>品尝哈大饼<br>畅享饕餮盛宴</p>
+                    <h1>西蒙零售<br>批发管理平台</h1>
+                    <p>便捷管理<br>数据透明<br>专业的团队指导<br>更好的产品服务</p>
                 </div>
             </section>
             <section class="form-Area">

@@ -2,18 +2,23 @@
 import { reactive, ref } from 'vue';
 
 let aside_list = reactive([
-  { id: 1, icon: 'bx-grid-alt', title: '首页', isactive: 'active',url:'/home' },
-  { id: 2, icon: 'bx-cog', title: '物料管理', isactive: '',url:'/home/B' },
-  { id: 3, icon: 'bx-lemon', title: '商品管理', isactive: '',url:'/home/c' },
-  { id: 4, icon: 'bx-cart-alt', title: '订单管理', isactive: '',url:'/home/d' },
-  { id: 5, icon: 'bx-user', title: '员工管理', isactive: '',url:'/home/e' },
-  { id: 6, icon: 'bx-credit-card', title: '财务管理', isactive: '',url:'/home/f' },
+  { id: 1, icon: 'bx-grid-alt', title: '首页', isactive: 'active', url: '/home' },
+  { id: 2, icon: 'bx-cog', title: '仓库管理', isactive: '', url: '/home/B' },
+  { id: 3, icon: 'bx-lemon', title: '货品管理', isactive: '', url: '/home/c' },
+  { id: 4, icon: 'bx-cart-alt', title: '订单管理', isactive: '', url: '/home/d' },
+  { id: 5, icon: 'bx-user', title: '客户管理', isactive: '', url: '/home/e' },
+  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', isactive: '', url: '/home/f' },
+  { id: 6, icon: 'bxs-backpack', title: '供货商管理', isactive: '', url: '/home/f' },
 ]);
 
 let isactive = ref('');
 let menu_btn = () => {
-  if (!isactive.value) { isactive.value = 'active'; }
-  else { isactive.value = ''; }
+  if (!isactive.value) {
+    isactive.value = 'active';
+  }
+  else {
+    isactive.value = '';
+  }
 };
 
 let Search_btn = () => {
@@ -35,7 +40,7 @@ let li_click = (id: number) => {
     <div class="logo-content">
       <div class="logo">
         <i class='bx bxl-flutter'></i>
-        <h3>"哈大饼"<br />管理平台</h3>
+        <h3>西蒙零售<br />批发管理平台</h3>
       </div>
       <i class='bx bx-menu' id="btn" @click="menu_btn"></i>
     </div>
@@ -69,9 +74,6 @@ let li_click = (id: number) => {
 
 <style lang="scss" scoped>
 .sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
   width: 80px;
   height: 100%;
   @include background_color('bg-300');
@@ -96,7 +98,7 @@ let li_click = (id: number) => {
 
     ul li {
       .tooltip {
-        opacity: 0!important;
+        opacity: 0 !important;
       }
 
       .links-name {
@@ -128,7 +130,7 @@ let li_click = (id: number) => {
 
   #btn {
     position: absolute;
-    color: #fff; 
+    color: #fff;
     font-size: 35px;
     width: 50px;
     height: 80px;
@@ -241,9 +243,10 @@ let li_click = (id: number) => {
     width: 70%;
   }
 }
-@keyframes animateBg{
-    to {
-        filter: hue-rotate(360deg);
-    }
+
+@keyframes animateBg {
+  to {
+    filter: hue-rotate(360deg);
   }
+}
 </style>

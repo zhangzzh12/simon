@@ -1,8 +1,6 @@
 import { createRouter,createWebHistory } from "vue-router";
 import LoginView from "@/pages/LoginView.vue";
 import LoginAndRegister from "@/components/LoginAndRegister.vue";
-import Forget from "@/components/Forget.vue";
-import PhoneVerify from "@/components/PhoneVerify.vue";
 const router = createRouter({
     history:createWebHistory(),
     routes :[
@@ -13,14 +11,6 @@ const router = createRouter({
                 {
                     path:'',
                     component: LoginAndRegister,
-                },
-                {
-                    path:'forget',//不要加斜杠
-                    component: Forget,
-                },
-                {
-                    path:'phone',//不要加斜杠
-                    component: PhoneVerify,
                 },
             ],
         },
