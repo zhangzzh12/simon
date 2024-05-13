@@ -22,6 +22,7 @@ const props = defineProps({
 const chart = ref();//dom引用
 
 const option = reactive({
+    color: ['#ddb900'],
     title: {
         text: props.chartTitle,
         textStyle: {
@@ -29,9 +30,14 @@ const option = reactive({
         },
         left: 'center',
     },
-    tooltip: {},
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {        
+            type: 'shadow'       
+        }
+    },
     legend: {
-        data: ['人数'],
+        data: ['箱数'],
         left:'left',
     },
     xAxis: {
@@ -40,7 +46,7 @@ const option = reactive({
     yAxis: {},
     series: [
         {
-            name: '人数',
+            name: '箱数',
             type: 'bar',
             data:props.chartData,
         }
@@ -61,7 +67,7 @@ onMounted(()=>{
 </script>
 
 <template>
-    <div ref="chart" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;"></div>
+    <div ref="chart" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;margin: 10px;"></div>
 </template>
 
 <style lang="scss" scoped></style>

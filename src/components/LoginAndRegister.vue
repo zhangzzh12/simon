@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { ref, onMounted,reactive } from 'vue';
+import axios from 'axios';
+const http = axios.create({
+    baseURL:'https://eel-rapid-grizzly.ngrok-free.app',
+    timeout: 5000
+});
+
+const user = reactive({
+    username:'',
+    password:''
+});
 
 let isactive = ref(false);
 const registerLink = () => {
@@ -12,8 +22,7 @@ function sublim() {
     let num = show_num.join("");
     if (!value) return alert('请输入验证码！');
     if (value == num) {
-        alert('提交成功！');
-        dj();
+        http.post('/login',user);
     } else {
         alert('验证码错误！\n你输入的是:  ' + value + "\n正确的是:  " + num + '\n请重新输入！');
         dj();
@@ -207,12 +216,12 @@ const closeVerify = (index:number) => {
             <form action="#">
                 <div class="input-box">
                     <i class='bx bxs-envelope'></i>
-                    <input type="text" required>
+                    <input type="text" required v-model="user.username">
                     <label>用户名</label>
                 </div>
                 <div class="input-box">
                     <i class='bx bxs-lock-alt'></i>
-                    <input type="password" required>
+                    <input type="password" required v-model="user.password">
                     <label>密码</label>
                 </div>
                 <div class="input-box code">
@@ -225,7 +234,7 @@ const closeVerify = (index:number) => {
                 <div class="remember-forgot">
                     <label><input type="checkbox">记住密码</label>
                 </div>
-                <button type="submit" class="btn" @click="sublim()">登录</button>
+                <div type="submit" class="btn" @click="sublim()">登录</div>
                 <div class="login-register">
                     <span>还没有一个账户？<a href="#" @click="registerLink">去注册</a></span>
                 </div>
@@ -281,7 +290,7 @@ const closeVerify = (index:number) => {
                 <div class="remember-forgot">
                     <label><input type="checkbox">同意相关条款</label>
                 </div>
-                <button type="submit" class="btn">注册</button>
+                <div type="submit" class="btn">注册</div>
                 <div class="login-register">
                     <span>已经拥有账户?<a href="#" class="login-link" @click="registerLink">去登陆</a></span>
                 </div>
@@ -513,6 +522,8 @@ const closeVerify = (index:number) => {
             font-weight: 500;
             font-size: 1.1em;
             transition: .2s;
+            text-align: center;
+            line-height: 45px;
 
             &:hover {
                 scale: 1.03;

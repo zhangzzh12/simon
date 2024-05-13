@@ -1,5 +1,5 @@
 import axios from 'axios';
-const instance = axios.create({
+const http = axios.create({
     baseURL:'',
     timeout: 5000
 });
