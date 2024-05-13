@@ -1,7 +1,4 @@
 <script setup lang="ts">
-const Query = () => {
-
-}
 </script>
 
 <template>
@@ -13,14 +10,19 @@ const Query = () => {
         <el-input placeholder="请输入货品名称"></el-input>
       </el-form-item>
 
-      <el-form-item label="">
-         <el-input></el-input>
+      <el-form-item label="售价">
+         <el-input placeholder="请输入货品售价"></el-input>
       </el-form-item>
 
-      <el-form-item label="">
-         <el-input></el-input>
+      <el-form-item label="种类">
+         <el-input placeholder="请输入货品种类"></el-input>
       </el-form-item>
-      <el-button type="primary" @click="Query" style="width:100px" >查询</el-button>
+
+      <el-form-item label="进价">
+         <el-input placeholder="请输入货品进价"></el-input>
+      </el-form-item>
+
+      <el-button type="primary" style="width:100px" >查询</el-button>
 
 </el-form>
 <el-button 
@@ -39,24 +41,17 @@ const Query = () => {
 >批量删除
 </el-button>
 
-<table>
-   <thead>
-      <tr>
-         <th></th>
-         <th></th>
-         <th></th>
-         <th></th>
-      </tr>
-   </thead>
-   <tbody>
-      <tr>
-      <th></th>
-      <th></th>
-      <th></th>
-      <th></th>
-      </tr>
-   </tbody>
-</table>
+<el-table boreder="true">
+   <el-table-column type="selection"align="center"></el-table-column>
+   <el-table-column align="center" label="货品名称"></el-table-column>
+   <el-table-column align="center" label="货品编号"></el-table-column>
+   <el-table-column align="center" label="售价"></el-table-column>
+   <el-table-column align="center" label="种类"></el-table-column>
+   <el-table-column align="center" label="进价"></el-table-column>
+   <el-table-column align="center" label="图片"></el-table-column>
+   <el-table-column align="center" label="操作"></el-table-column>
+</el-table>
+
 </template>
 
 <style lang="scss" scoped>
@@ -65,7 +60,5 @@ const Query = () => {
    justify-content: space-between;
    margin-right: 5vh;
 }
-.el-input{
-  background-color: #F9E4AD;
-}
+
 </style>
