@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useThemeStyleStore } from '@/stores/data';
+import { useThemeStyleStore } from '@/stores/data.ts';
 
 const { themeStyle } = useThemeStyleStore();
 
