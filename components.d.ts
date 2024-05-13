@@ -9,9 +9,15 @@ declare module 'vue' {
   export interface GlobalComponents {
     Aside: typeof import('./src/components/Aside.vue')['default']
     BarChart: typeof import('./src/components/chart/BarChart.vue')['default']
+    ElAside: typeof import('element-plus/es')['ElAside']
+    ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']
+    ElBreadcrumbItem: typeof import('element-plus/es')['ElBreadcrumbItem']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']
+    ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
+    ElDivider: typeof import('element-plus/es')['ElDivider']
+    ElFooter: typeof import('element-plus/es')['ElFooter']
     ElDialog: typeof import('element-plus/es')['ElDialog']
     ElDivider: typeof import('element-plus/es')['ElDivider']
     ElFooter: typeof import('element-plus/es')['ElFooter']
@@ -37,6 +43,9 @@ declare module 'vue' {
     PieChart: typeof import('./src/components/chart/PieChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

@@ -34,8 +34,8 @@ const nav_goTo = (id: string | number) => {
     router.push('/');
 };
 
-//面包
-const { title } = useMenuStore()
+//面包屑
+const { title } = useMenuStore();
 </script>
 
 <template>
@@ -49,7 +49,7 @@ const { title } = useMenuStore()
           <div class="home-title">
             <div class="bread">
               <span class="title-bread">{{ title.first }}</span>
-              <i class='bx bx-chevron-right'></i>
+              <i class='bx bx-chevron-right' v-if="title.second !== ''"></i>
               <span class="title-bread" v-if="title.second !== ''">{{ title.second }}</span>
             </div>
           </div>
@@ -128,10 +128,7 @@ const { title } = useMenuStore()
           gap: 8px;
           align-items: center;
           font-size: 25px;
-
-          .title-bread {
-            @include font_color('text-100');
-          }
+          @include font_color('text-100');
 
         }
 

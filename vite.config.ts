@@ -35,6 +35,13 @@ export default defineConfig({
   server:{
     open:true,
     port: 5174,
+    proxy:{
+      '/api':{
+        target:'http://eel-rapid-grizzly.ngrok-free.app',
+        changeOrigin:true,
+        rewrite:path =>path.replace(/^\/api/,''),
+      },
+    }
   },
   resolve:{
     alias:{

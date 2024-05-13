@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import BarChart from '@/components/chart/BarChart.vue';
+import { useMenuStore } from '@/stores/menu';
+import WarehousePanel from '@/components/WarehousePanel.vue';
 // 查询量
 const search_date = reactive({
     name: '',
@@ -35,7 +37,7 @@ const page_data_number = [
         value: 100,
         label: 100,
     },
-]
+];
 
 // 表格数据
 const tableData = ref([]);
@@ -46,6 +48,17 @@ const tableTitle = [
     { props: 'entrydate', label: '入职日期' },
     { props: 'updateTime', label: '最后操作时间' },
 ];
+
+//面包屑
+const { title } = useMenuStore();
+onMounted(() => {
+    title.first = '仓库管理';
+    title.second = '店铺';
+});
+
+
+//新增货品项
+const dialogVisible = ref(false);
 </script>
 
 <template>
@@ -70,7 +83,7 @@ const tableTitle = [
                             <div class="button" @click="">查询</div>
                         </form>
                         <section class="button-box">
-                            <div class="button" @click="">+ 新增货品项</div>
+                            <div class="button" @click="dialogVisible = true">+ 新增货品项</div>
                         </section>
                         <section class="table-box">
                             <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
@@ -102,10 +115,21 @@ const tableTitle = [
                                 </div>
                             </div>
                         </section>
+                        <el-dialog v-model="dialogVisible" width="350">
+                            <WarehousePanel title="新增学员">
+                                <template v-slot:button>
+                                    <div class="button-box">
+                                        <div class="button">新增</div>
+                                        <div class="button" @click="dialogVisible = false">取消</div>
+                                    </div>
+                                </template>
+                            </WarehousePanel>
+                        </el-dialog>
                     </div>
                     <div class="statistics-box">
                         <section class="bar-box">
-                            <BarChart chartTitle="仓位速览" :chartX="['A货', 'B货']" :chartData="[{ value: 15, name: 'A货'},{ value: 15, name: 'B货'},]" /> 
+                            <BarChart chartTitle="仓位速览" :chartX="['A货', 'B货']"
+                                :chartData="[{ value: 15, name: 'A货' }, { value: 15, name: 'B货' },]" />
                         </section>
                         <section class="table-box ledger">
                             <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
@@ -261,16 +285,20 @@ const tableTitle = [
         }
 
         .showdata-box {
-            width: 60%;
-            padding: 30px 30px 10px 30px;
+            width: 55%;
+            padding: 50px 30px 10px 30px;
             display: flex;
             flex-direction: column;
             gap: 30px;
 
             .input-form {
+                padding: 15px 25px;
+                border-radius: 12px;
+                box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                @include background-color('bg-200');
 
                 .input-box {
                     @include font_color('text-100');
@@ -294,58 +322,25 @@ const tableTitle = [
                 position: relative;
 
             }
-
-            .addClass-box {
-
-                position: fixed;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                z-index: 900;
-                background-color: hsla(230, 75%, 15%, .1);
-                backdrop-filter: blur(1px);
-                -webkit-backdrop-filter: blur(1px);
-                /* For safari */
-                padding: 8rem 1.5rem 0;
-                opacity: 0;
-                pointer-events: none;
-                transition: opacity .4s;
-
-                &.active {
-                    opacity: 1;
-                    pointer-events: initial;
-                }
-
-                .wrapper {
-
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-
-                    @include background_color('bg-300');
-                    border: rgba(49, 61, 68, .5) solid 3px;
-                    box-shadow: 10px 10px 10px rgba(49, 61, 68, .5);
-                    padding: 35px;
-
-                }
-            }
         }
 
         .statistics-box {
-            width: 40%;
+            width: 45%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
             gap: 20px;
             padding: 30px 30px 10px 10px;
+
             .bar-box {
                 height: 0;
                 position: relative;
                 padding-top: 50%;
                 width: 80%;
+                border-radius: 12px;
+                box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
+                @include background_color('bg-200')
             }
         }
     }
