@@ -27,8 +27,8 @@ const router = createRouter({
                     component:()=>import("@/pages/Layout/warehouse.vue"),
                 },
                 {
-                    path:'c',
-                    component:()=>import("@/pages/Layout/C.vue"),
+                    path:'goodsManage',
+                    component:()=>import("@/pages/Layout/goodsManage.vue"),
                 },
                 {
                     path:'d',
