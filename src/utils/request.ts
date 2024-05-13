@@ -11,6 +11,7 @@ instance.interceptors.request.use(
         const tokenstore = tokenStore()
         if (tokenstore.token) {
             config.headers.Authorization = tokenstore.token
+            config.headers["ngrok-skip-browser-warning"] = 0
         }
         return config
     },
