@@ -47,9 +47,6 @@ function draw(show_num:string[]|number[], codeLength = 4) { // codeLength: 设�
     let canvas = document.getElementById("canvas");//获取到canvas的对象，演员
     let context = canvas!.getContext("2d");//获取到canvas画图的环境，演员表演的舞台
     let canvas_width = canvas!.width;
-    console.log('canvas',canvas);
-
-    console.log('canvas_width',canvas_width);
     
     let canvas_height = canvas!.height;
     context.clearRect(0, 0, canvas_width, canvas_height);

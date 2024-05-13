@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Aside from '@/components/Aside.vue';
 import { useThemeStyleStore } from '@/stores/data';
+import { useMenuStore } from '@/stores/menu';
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -32,16 +33,26 @@ const nav_goTo = (id: string | number) => {
   if (id === '1' || id === 1)
     router.push('/');
 };
+
+//面包
+const { title } = useMenuStore()
 </script>
 
 <template>
   <div class="home-main">
     <el-container class="home-container">
-      <div class="aside">
+      <div class="aside" style="z-index: 1024;">
         <Aside />
       </div>
       <el-container>
         <el-header>
+          <div class="home-title">
+            <div class="bread">
+              <span class="title-bread">{{ title.first }}</span>
+              <i class='bx bx-chevron-right'></i>
+              <span class="title-bread" v-if="title.second !== ''">{{ title.second }}</span>
+            </div>
+          </div>
           <ul class="header-nav">
             <li v-for="value in nav_list" :key="value.id" @click="nav_goTo(value.id)">
               <i class="bx" :class="value.iconType"></i>
@@ -97,15 +108,34 @@ const nav_goTo = (id: string | number) => {
 
     .el-header {
       width: 100%;
-      padding: 25px 100px;
+      padding: 25px 30px 25px 20px;
       height: 16vh;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
       z-index: 99;
       border-bottom: 2px solid rgba(0, 0, 0, .3);
-      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 0 30px rgba(0, 0, 0, .8);
       @include background_color('bg-200');
+
+      .home-title {
+        padding: 10px 8px;
+        border-left: 10px solid;
+        @include border_color('accent-200');
+
+        .bread {
+          display: flex;
+          gap: 8px;
+          align-items: center;
+          font-size: 25px;
+
+          .title-bread {
+            @include font_color('text-100');
+          }
+
+        }
+
+      }
 
       .header-nav {
         margin-right: 30%;
