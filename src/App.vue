@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import zhCn from 'element-plus/dist/locale/zh-cn.mjs';
+import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 </script>
 <template>
     <el-config-provider :locale="zhCn">
         <transition name="fade" mode="out-in">
             <RouterView />
-        </transition>
+        </transition>        
     </el-config-provider>
+
 </template>
 <style scoped>
 .fade-enter-active,
