@@ -12,7 +12,7 @@ import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 <style scoped>
 .fade-enter-active,
 .fade-leave-active {
-     transition: opacity 1s;
+    transition: opacity 1s;
 }
 
 .fade-enter-to,

@@ -3,7 +3,7 @@ import { reactive, ref } from 'vue';
 
 let aside_list = reactive([
   { id: 1, icon: 'bx-grid-alt', title: '首页', isactive: 'active', url: '/home' },
-  { id: 2, icon: 'bx-cog', title: '仓库管理', isactive: '', url: '/home/B' },
+  { id: 2, icon: 'bx-cog', title: '仓库管理', isactive: '', url: '/home/warehouse' },
   { id: 3, icon: 'bx-lemon', title: '货品管理', isactive: '', url: '/home/c' },
   { id: 4, icon: 'bx-cart-alt', title: '订单管理', isactive: '', url: '/home/d' },
   { id: 5, icon: 'bx-user', title: '客户管理', isactive: '', url: '/home/e' },
@@ -81,7 +81,6 @@ let li_click = (id: number) => {
   box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.6);
   padding: 6px 14px;
   transition: all .5s ease;
-  z-index: 1024;
 
   &.active {
     width: 240px;
