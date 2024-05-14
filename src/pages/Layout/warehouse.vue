@@ -8,6 +8,7 @@ const search_date = reactive({
     name: '',
     gender: '',
     entrydate: '',
+    ledgerdate: '',
 });
 //加载值
 const loading = ref(false);
@@ -66,102 +67,115 @@ const dialogVisible = ref(false);
         <el-scrollbar>
             <el-container style="display: flex;justify-content: space-between;">
                 <el-main>
-                    <div class="showdata-box">
-                        <form class="input-form">
-                            <div class="input-box">
-                                <span>货品名称</span>
-                                <el-input v-model="search_date.name" placeholder="请输入货品名称" style="width: 150px;" />
-                            </div>
-                            <div class="input-box">
-                                <span>种类</span>
-                                <el-select v-model="search_date.gender" placeholder="请选择" style="width: 100px;">
-                                    <el-option label="男" value=1 />
-                                    <el-option label="女" value=2 />
-                                    <el-option label="全部" value='' />
-                                </el-select>
-                            </div>
-                            <div class="button" @click="">查询</div>
-                        </form>
-                        <section class="button-box">
-                            <div class="button" @click="dialogVisible = true">+ 新增货品项</div>
-                        </section>
-                        <section class="table-box">
-                            <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
-                                <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label"
-                                    align="center" />
-                                <el-table-column label="操作" align="center">
-                                    <template #default="scope">
-                                        <el-button type="primary" size="small" @click.prevent="">入库</el-button>
-                                        <el-button link type="primary" size="small" @click.prevent="">出库</el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                            <div class="page-box">
-                                <div class="data-select">
-                                    <span>每页至多展示数据数</span>
-                                    <el-select v-model="page_data_value" placeholder="请选择" style="width: 100px;"
-                                        @change="">
-                                        <el-option v-for="item in page_data_number" :key="item.value"
-                                            :label="item.label" :value="item.value" />
-                                    </el-select>
-                                </div>
-                                <div class="wrapper">
-                                    <div class="total-data">
-                                        共<span>{{ total_page_number }}</span>条数据
-                                    </div>
-                                    <el-pagination background layout="prev, pager, next" :total="total_page_number"
-                                        :page-size="page_data_value" @current-change="" hide-on-single-page="true"
-                                        v-model:current-page="page_index" />
-                                </div>
-                            </div>
-                        </section>
-                        <el-dialog v-model="dialogVisible" width="350">
-                            <WarehousePanel title="新增学员">
-                                <template v-slot:button>
-                                    <div class="button-box">
-                                        <div class="button">新增</div>
-                                        <div class="button" @click="dialogVisible = false">取消</div>
-                                    </div>
-                                </template>
-                            </WarehousePanel>
-                        </el-dialog>
-                    </div>
-                    <div class="statistics-box">
-                        <section class="bar-box">
+                    <section class="statistic-box">
+                        <div class="bar-box">
                             <BarChart chartTitle="仓位速览" :chartX="['A货', 'B货']"
                                 :chartData="[{ value: 15, name: 'A货' }, { value: 15, name: 'B货' },]" />
-                        </section>
-                        <section class="table-box ledger">
-                            <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
-                                <el-table-column prop="date" label="日期" align="center" />
-                                <el-table-column prop="date" label="货品名称" align="center" />
-                                <el-table-column prop="date" label="变动" align="center" />
-                                <el-table-column label="操作" align="center" width="200px">
-                                    <template #default="scope">
-                                        <el-button type="primary" size="small" @click.prevent="">撤销</el-button>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                            <div class="page-box">
-                                <div class="data-select">
-                                    <span>每页至多展示数据数</span>
-                                    <el-select v-model="page_data_value" placeholder="请选择" style="width: 80px;"
-                                        @change="">
-                                        <el-option v-for="item in page_data_number" :key="item.value"
-                                            :label="item.label" :value="item.value" />
+                        </div>
+                    </section>
+                    <section class="data-box">
+                        <div class="showdata-box">
+                            <form class="input-form">
+                                <div class="input-box">
+                                    <span>货品名称</span>
+                                    <el-input v-model="search_date.name" placeholder="请输入货品名称" style="width: 150px;" />
+                                </div>
+                                <div class="input-box">
+                                    <span>种类</span>
+                                    <el-select v-model="search_date.gender" placeholder="请选择" style="width: 100px;">
+                                        <el-option label="男" value=1 />
+                                        <el-option label="女" value=2 />
+                                        <el-option label="全部" value='' />
                                     </el-select>
                                 </div>
-                                <div class="wrapper">
-                                    <div class="total-data">
-                                        共<span>{{ total_page_number }}</span>条数据
+                                <div class="button" @click="">查询</div>
+                            </form>
+                            <section class="button-box">
+                                <div class="button" @click="dialogVisible = true">+ 新增货品项</div>
+                            </section>
+                            <section class="table-box">
+                                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto"
+                                    v-loading="loading">
+                                    <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label"
+                                        align="center" />
+                                    <el-table-column label="操作" align="center">
+                                        <template #default="scope">
+                                            <el-button type="primary" size="small" @click.prevent="">入库</el-button>
+                                            <el-button link type="primary" size="small" @click.prevent="">出库</el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div class="page-box">
+                                    <div class="data-select">
+                                        <span>每页至多展示数据数</span>
+                                        <el-select v-model="page_data_value" placeholder="请选择" style="width: 100px;"
+                                            @change="">
+                                            <el-option v-for="item in page_data_number" :key="item.value"
+                                                :label="item.label" :value="item.value" />
+                                        </el-select>
                                     </div>
-                                    <el-pagination background layout="prev, pager, next" :total="total_page_number"
-                                        :page-size="page_data_value" @current-change="" hide-on-single-page="true"
-                                        v-model:current-page="page_index" />
+                                    <div class="wrapper">
+                                        <div class="total-data">
+                                            共<span>{{ total_page_number }}</span>条数据
+                                        </div>
+                                        <el-pagination background layout="prev, pager, next" :total="total_page_number"
+                                            :page-size="page_data_value" @current-change="" hide-on-single-page="true"
+                                            v-model:current-page="page_index" />
+                                    </div>
                                 </div>
-                            </div>
-                        </section>
-                    </div>
+                            </section>
+                            <el-dialog v-model="dialogVisible" width="350">
+                                <WarehousePanel title="新增学员">
+                                    <template v-slot:button>
+                                        <div class="button-box">
+                                            <div class="button">新增</div>
+                                            <div class="button" @click="dialogVisible = false">取消</div>
+                                        </div>
+                                    </template>
+                                </WarehousePanel>
+                            </el-dialog>
+                        </div>
+                        <div class="ledger-box">
+                            <form class="input-form">
+                                <el-form-item label="入职时间">
+                                    <el-date-picker v-model="search_date.ledgerdate" type="date" placeholder="请选择入职时间"
+                                        value-format="YYYY-MM-DD" clearable style="width: 200px;" />
+                                </el-form-item>
+                                <div class="button" @click="">查询</div>
+                            </form>
+                            <section class="table-box ledger">
+                                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto"
+                                    v-loading="loading">
+                                    <el-table-column prop="date" label="日期" align="center" />
+                                    <el-table-column prop="date" label="货品名称" align="center" />
+                                    <el-table-column prop="date" label="变动" align="center" />
+                                    <el-table-column label="操作" align="center" width="200px">
+                                        <template #default="scope">
+                                            <el-button type="primary" size="small" @click.prevent="">撤销</el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                                <div class="page-box">
+                                    <div class="data-select">
+                                        <span>每页至多展示数据数</span>
+                                        <el-select v-model="page_data_value" placeholder="请选择" style="width: 80px;"
+                                            @change="">
+                                            <el-option v-for="item in page_data_number" :key="item.value"
+                                                :label="item.label" :value="item.value" />
+                                        </el-select>
+                                    </div>
+                                    <div class="wrapper">
+                                        <div class="total-data">
+                                            共<span>{{ total_page_number }}</span>条数据
+                                        </div>
+                                        <el-pagination background layout="prev, pager, next" :total="total_page_number"
+                                            :page-size="page_data_value" @current-change="" hide-on-single-page="true"
+                                            v-model:current-page="page_index" />
+                                    </div>
+                                </div>
+                            </section>
+                        </div>
+                    </section>
                 </el-main>
                 <el-footer>
                     <div class="copyright">Copyright © , All Rights Reserved.</div>
@@ -202,8 +216,10 @@ const dialogVisible = ref(false);
 
     .el-main {
         display: flex;
+        flex-direction: column;
         justify-content: space-between;
-        padding-bottom: 60px;
+        align-items: center;
+        padding: 60px 0;
 
         .button {
             min-width: 100px;
@@ -284,12 +300,28 @@ const dialogVisible = ref(false);
             }
         }
 
-        .showdata-box {
-            width: 55%;
-            padding: 50px 30px 10px 30px;
+        .statistic-box {
+            width: 100%;
             display: flex;
-            flex-direction: column;
-            gap: 30px;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 50px;
+
+            .bar-box {
+                height: 0;
+                position: relative;
+                padding-top: 30%;
+                width: 70%;
+                border-radius: 12px;
+                box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
+                @include background_color('bg-200');
+            }
+        }
+
+        .data-box {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
 
             .input-form {
                 padding: 15px 25px;
@@ -298,6 +330,7 @@ const dialogVisible = ref(false);
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                gap: 20px;
                 @include background-color('bg-200');
 
                 .input-box {
@@ -317,30 +350,37 @@ const dialogVisible = ref(false);
 
             }
 
-            .button-box {
+            .showdata-box {
+                width: 55%;
+                padding: 50px 30px 10px 30px;
                 display: flex;
-                position: relative;
+                flex-direction: column;
+                gap: 30px;
 
+
+                .button-box {
+                    display: flex;
+                    position: relative;
+
+                }
             }
-        }
 
-        .statistics-box {
-            width: 45%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            align-items: center;
-            gap: 20px;
-            padding: 30px 30px 10px 10px;
-
-            .bar-box {
-                height: 0;
-                position: relative;
-                padding-top: 50%;
-                width: 80%;
+            .ledger-box {
+                width: 45%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+                gap: 20px;
+                padding: 50px 30px 10px 30px;
                 border-radius: 12px;
-                box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
-                @include background_color('bg-200')
+                box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
+                padding-bottom: 40px;
+                margin-right: 30px;
+                @include background_color('bg-300');
+                .ledger{
+                    box-shadow: 5px 5px 10px rgba(49, 61, 68, .8);
+                }
             }
         }
     }

@@ -4,8 +4,8 @@ import { defineStore } from "pinia";
 
 export const useMenuStore = defineStore('menu',()=>{
     const title = reactive({
-        'first':'仓库管理',
-        'second':'店铺',
+        'first':'首页',
+        'second':'',
     });
 
     const asideList_id = ref(['active','','','','','','']);

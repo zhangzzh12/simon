@@ -31,8 +31,8 @@ const router = createRouter({
                     component:()=>import("@/pages/Layout/goodsManage.vue"),
                 },
                 {
-                    path:'d',
-                    component:()=>import("@/pages/Layout/D.vue"),
+                    path:'orderManage',
+                    component:()=>import("@/pages/Layout/OrderManage.vue"),
                 },
                 {
                     path:'e',
