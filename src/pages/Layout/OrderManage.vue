@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { useMenuStore } from '@/stores/menuData';
 import { onMounted, ref, reactive } from 'vue';
+import OrderPanel from '@/components/OrderPanel.vue';
+import { allOrderGetService, orderGetService } from '@/api/order';
 
 
 const { title } = useMenuStore();
@@ -8,14 +10,13 @@ const { title } = useMenuStore();
 onMounted(() => {
     title.first = '销售单';
     title.second = '收银';
+    // getorder();
 });
 
 // 查询量
 const search_date = reactive({
-    name: '',
-    gender: '',
-    entrydate: '',
-    ledgerdate: '',
+    date: '',
+    status: '',
 });
 //加载值
 const loading = ref(false);
@@ -24,18 +25,29 @@ const loading = ref(false);
 const page_index = ref(1);
 const total_page_number = ref(0);
 
+//条件查询销售单
+
+const getorder = async ()=>{
+    const res = await allOrderGetService();
+    console.log(res.data);
+};
+
+
+
 // 表格数据
 const tableData = ref([]);
 const tableTitle = [
     { props: 'name', label: '货品名称' },
-    { props: 'gender', label: '性别' },
-    { props: 'job', label: '职位' },
-    { props: 'entrydate', label: '入职日期' },
-    { props: 'updateTime', label: '最后操作时间' },
+    { props: 'gender', label: '货品数量' },
+    { props: 'job', label: '货品单价' },
+    { props: 'date', label: '交易记录时间' },
 ];
 
-//弹框
+//新增销售单
 const dialogVisible = ref(false);
+const addorder = () => {
+    dialogVisible.value = true;
+};
 
 //订单info
 
@@ -55,25 +67,25 @@ const order_info = ref([
                 <el-main>
                     <form class="input-form">
                         <div class="input-box flex">
-                            <span>入职时间</span>
+                            <span>时间范围</span>
                             <div class="block">
-                                <el-date-picker v-model="search_date.entrydate" type="daterange" range-separator="-"
-                                    start-placeholder="开始时间" end-placeholder="结束时间" unlink-panels="true"
+                                <el-date-picker v-model="search_date.date" type="daterange" range-separator="-"
+                                    start-placeholder="最早时间" end-placeholder="最晚时间" unlink-panels="true"
                                     style="width: 240px" value-format="YYYY-MM-DD" />
                             </div>
                         </div>
                         <div class="input-box ">
                             <span>状态</span>
-                            <el-select v-model="search_date.gender" placeholder="请选择" style="width: 100px">
-                                <el-option label="男" value=1 />
-                                <el-option label="女" value=2 />
-                                <el-option label="全部" value='' />
+                            <el-select v-model="search_date.status" placeholder="请选择" style="width: 100px">
+                                <el-option label="未审核" value=0 />
+                                <el-option label="已审核" value=1 />
+                                <el-option label="已退货" value=2 />
                             </el-select>
                         </div>
                         <div class="button">查询</div>
                     </form>
                     <section class="button-box">
-                        <div class="button">+ 新增销售单</div>
+                        <div class="button" @click="addorder">进行结账(新增销售单)</div>
                     </section>
                     <section class="order-box">
                         <div class="info-box">
@@ -85,17 +97,8 @@ const order_info = ref([
                         </div>
                         <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading"
                             class="table-box">
-                            <el-table-column type="selection" prop="id" />
-                            <el-table-column prop="name" label='姓名' align="center">
-                            </el-table-column>
                             <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label"
                                 align="center" />
-                            <el-table-column label="操作" align="center">
-                                <template #default="scope">
-                                    <el-button type="primary" size="small" @click.prevent=''>编辑</el-button>
-                                    <el-button link type="primary" size="small" @click.prevent=''>删除</el-button>
-                                </template>
-                            </el-table-column>
                         </el-table>
                     </section>
                     <section class="button-box page">
@@ -103,13 +106,8 @@ const order_info = ref([
                         <div class="button">退货</div>
                         <div class="button">下一页</div>
                     </section>
-                    <el-dialog v-model="dialogVisible" width="350">
-                        <AddEmpPanel title="修改员工">
-                            <template v-slot:button>
-                                <el-button type="primary" @click="">保存</el-button>
-                                <el-button type="primary" @click="">取消</el-button>
-                            </template>
-                        </AddEmpPanel>
+                    <el-dialog v-model="dialogVisible" width="600" draggable>
+                        <OrderPanel title="销售单结账进行中" />
                     </el-dialog>
                 </el-main>
                 <el-footer>
@@ -214,7 +212,8 @@ const order_info = ref([
         .button-box {
             display: flex;
             position: relative;
-            &.page{
+
+            &.page {
                 justify-content: space-between;
                 align-items: center;
                 padding: 0 20%;
@@ -244,8 +243,6 @@ const order_info = ref([
                     }
 
                     .data {
-                        // border: 2px solid;
-                        // @include border_color('text-100');
                         box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
                         margin-left: 8px;
                         @include background_color('bg-300');

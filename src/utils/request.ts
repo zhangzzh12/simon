@@ -10,7 +10,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
     (config) => {
         const tokenstore = tokenStore();
-        console.log(tokenstore.token);
         
         if (tokenstore.token) {
             config.headers.Authorization = tokenstore.token

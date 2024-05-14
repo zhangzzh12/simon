@@ -35,6 +35,7 @@ declare module 'vue' {
     ElUpload: typeof import('element-plus/es')['ElUpload']
     GoodsPanel: typeof import('./src/components/GoodsPanel.vue')['default']
     LoginAndRegister: typeof import('./src/components/LoginAndRegister.vue')['default']
+    OrderPanel: typeof import('./src/components/OrderPanel.vue')['default']
     PieChart: typeof import('./src/components/chart/PieChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
