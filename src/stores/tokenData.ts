@@ -5,9 +5,9 @@ export const tokenStore = defineStore(
   () => {
     const token = ref('')
 
-    const setToken = (newToken) => {
-      token.value = newToken
-    }
+    const setToken = (newToken: string) => {
+      token.value = newToken;
+    };
 
     const removeToken = () => {
       token.value = ''
@@ -20,4 +20,4 @@ export const tokenStore = defineStore(
     }
   }, {
   persist: true
-})
+});

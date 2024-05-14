@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { tokenStore } from '@/stores/tokenData.ts'
+import { ElMessage } from 'element-plus'
 const baseURL = 'https://eel-rapid-grizzly.ngrok-free.app'
 const instance = axios.create({
     baseURL,
@@ -8,7 +9,9 @@ const instance = axios.create({
 //请求拦截器
 instance.interceptors.request.use(
     (config) => {
-        const tokenstore = tokenStore()
+        const tokenstore = tokenStore();
+        console.log(tokenstore.token);
+        
         if (tokenstore.token) {
             config.headers.Authorization = tokenstore.token
             config.headers["ngrok-skip-browser-warning"] = 0
@@ -24,7 +27,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     (res) => {
         if (res.data.code === 1) {
-            return res
+            return res.data
         }
         ElMessage.error(res.data.msg)
         return Promise.reject(res.data)

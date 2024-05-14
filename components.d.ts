@@ -37,6 +37,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     WarehousePanel: typeof import('./src/components/WarehousePanel.vue')['default']
+    WarehousePanel: typeof import('./src/components/WarehousePanel.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']

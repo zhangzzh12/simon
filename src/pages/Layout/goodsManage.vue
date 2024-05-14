@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
-import GoodsPanel from '@/components/GoodsPanel.vue';
-import { useMenuStore } from '@/stores/menuData.ts';
-import { goodsGetService } from '@/api/goods';
+import { onMounted, ref } from 'vue'
+import GoodsPanel from '@/components/GoodsPanel.vue'
+import { useMenuStore } from '@/stores/menuData';
 const total = ref(0)
 const dialog = ref()
 const form = ref()
@@ -79,8 +78,6 @@ const rules = {
    ]
 }
 const getGoods = async () => {
-   const res = await goodsGetService(formModel.value)
-   formModel.value = res.data.data
 }
 
 const onSizeChange = (size: number) => {

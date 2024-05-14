@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, reactive, onMounted } from 'vue';
 import BarChart from '@/components/chart/BarChart.vue';
-import { useMenuStore } from '@/stores/menuData.ts';
+import { useMenuStore } from '@/stores/menuDataData.ts';
 import WarehousePanel from '@/components/WarehousePanel.vue';
 // 查询量
 const search_date = reactive({
