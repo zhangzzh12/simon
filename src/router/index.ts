@@ -1,46 +1,46 @@
-import { createRouter,createWebHistory } from "vue-router";
+import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "@/pages/LoginView.vue";
 import LoginAndRegister from "@/components/LoginAndRegister.vue";
 const router = createRouter({
-    history:createWebHistory(),
-    routes :[
+    history: createWebHistory(),
+    routes: [
         {
-            path:'/',
+            path: '/',
             component: LoginView,
-            children:[
+            children: [
                 {
-                    path:'',
+                    path: '',
                     component: LoginAndRegister,
                 },
             ],
         },
         {
-            path:'/home',
-            component:()=>import("@/pages/HomeView.vue"),
-            children:[
+            path: '/home',
+            component: () => import("@/pages/HomeView.vue"),
+            children: [
                 {
-                    path:'',
-                    component:()=>import("@/pages/Layout/A.vue"),
+                    path: '',
+                    component: () => import("@/pages/Layout/A.vue"),
                 },
                 {
-                    path:'warehouse',
-                    component:()=>import("@/pages/Layout/warehouse.vue"),
+                    path: 'warehouse',
+                    component: () => import("@/pages/Layout/warehouse.vue"),
                 },
                 {
-                    path:'goodsManage',
-                    component:()=>import("@/pages/Layout/goodsManage.vue"),
+                    path: 'goodsManage',
+                    component: () => import("@/pages/Layout/goodsManage.vue"),
                 },
                 {
-                    path:'d',
-                    component:()=>import("@/pages/Layout/D.vue"),
+                    path: 'd',
+                    component: () => import("@/pages/Layout/D.vue"),
                 },
                 {
-                    path:'e',
-                    component:()=>import("@/pages/Layout/E.vue"),
+                    path: 'e',
+                    component: () => import("@/pages/Layout/E.vue"),
                 },
                 {
-                    path:'f',
-                    component:()=>import("@/pages/Layout/F.vue"),
+                    path: 'f',
+                    component: () => import("@/pages/Layout/F.vue"),
                 },
             ]
         },

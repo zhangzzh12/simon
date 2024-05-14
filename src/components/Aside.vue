@@ -1,14 +1,15 @@
 <script lang="ts" setup>
+import { useMenuStore } from '@/stores/menuData';
 import { reactive, ref } from 'vue';
 
 let aside_list = reactive([
-  { id: 1, icon: 'bx-grid-alt', title: '首页', isactive: 'active', url: '/home' },
-  { id: 2, icon: 'bx-cog', title: '仓库管理', isactive: '', url: '/home/warehouse' },
-  { id: 3, icon: 'bx-lemon', title: '货品管理', isactive: '', url: '/home/c' },
-  { id: 4, icon: 'bx-cart-alt', title: '订单管理', isactive: '', url: '/home/d' },
-  { id: 5, icon: 'bx-user', title: '客户管理', isactive: '', url: '/home/e' },
-  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', isactive: '', url: '/home/f' },
-  { id: 6, icon: 'bxs-backpack', title: '供货商管理', isactive: '', url: '/home/f' },
+  { id: 1, icon: 'bx-grid-alt', title: '首页', url: '/home' },
+  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/home/warehouse' },
+  { id: 3, icon: 'bx-lemon', title: '货品管理', url: '/home/goodsManage' },
+  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/home/d' },
+  { id: 5, icon: 'bx-user', title: '客户管理', url: '/home/e' },
+  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', url: '/home/f' },
+  { id: 7, icon: 'bxs-backpack', title: '供货商管理', url: '/home/f' },
 ]);
 
 let isactive = ref('');
@@ -26,11 +27,15 @@ let Search_btn = () => {
   else { isactive.value = ''; }
 };
 
+
+const { title , asideList_id } = useMenuStore();
+
 let li_click = (id: number) => {
-  aside_list.forEach((item) => {
-    item.isactive = '';
-  });
-  aside_list[id - 1].isactive = 'active';
+  for(let i=0;i<asideList_id.length;++i){
+    asideList_id[i]='';
+  }
+  asideList_id[id] = 'active';
+  console.log(asideList_id);
 };
 
 </script>
@@ -53,7 +58,7 @@ let li_click = (id: number) => {
           <input type="text" placeholder="Search">
         </a>
       </li>
-      <li v-for="value in aside_list" :key="value.id" :class="value.isactive" @click="li_click(value.id)">
+      <li v-for="value in aside_list" :key="value.id" :class="asideList_id[value.id]" @click="li_click(value.id)">
         <RouterLink :to="value.url">
           <i class='bx' :class="value.icon"></i>
           <span class="links-name">{{ value.title }}</span>

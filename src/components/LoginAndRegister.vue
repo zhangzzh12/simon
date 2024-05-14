@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted,reactive } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import axios from 'axios';
+import { tokenStore } from '@/stores/tokenData';
+import request from '@/utils/request.ts';
 const http = axios.create({
-    baseURL:'https://eel-rapid-grizzly.ngrok-free.app',
+    baseURL: 'https://eel-rapid-grizzly.ngrok-free.app',
     timeout: 5000
 });
 
 const user = reactive({
-    username:'',
-    password:''
+    username: '',
+    password: ''
 });
 
 let isactive = ref(false);
@@ -16,17 +18,25 @@ const registerLink = () => {
     isactive.value = !isactive.value;
 };
 //验证码
-let show_num:number[] = [];
+let show_num: number[] = [];
 let value = '';
-function sublim() {
+const sublim = async () => {
     let num = show_num.join("");
     if (!value) return alert('请输入验证码！');
     if (value == num) {
-        http.post('/login',user);
+        const res = await request.post('/login', user);
+        //    await http.get('/warehouse',{params:{page:1,pageSize:10}});
+        const tokenstore = tokenStore();
+        tokenstore.token = res.data.data;
+        console.log(tokenstore.token);
     } else {
         alert('验证码错误！\n你输入的是:  ' + value + "\n正确的是:  " + num + '\n请重新输入！');
         dj();
     }
+};
+
+const test = async ()=>{
+    await request.get('/warehouse',{params:{page:1,pageSize:10}});
 };
 function charList(length = 26, code = 'a') {
     // fromCharCode: 将Unicode编码转为一个字符:
@@ -52,11 +62,11 @@ function getCode() {
 
     return [...lowercaseAlphabet, ...uppercaseAlphabet, ...numsZeroToNine]
 }
-function draw(show_num:string[]|number[], codeLength = 4) { // codeLength: 设置验证码长度
+function draw(show_num: string[] | number[], codeLength = 4) { // codeLength: 设置验证码长度
     let canvas = document.getElementById("canvas");//获取到canvas的对象，演员
     let context = canvas!.getContext("2d");//获取到canvas画图的环境，演员表演的舞台
     let canvas_width = canvas!.width;
-    
+
     let canvas_height = canvas!.height;
     context.clearRect(0, 0, canvas_width, canvas_height);
 
@@ -107,11 +117,11 @@ function randomColor() {
     return "rgb(" + r + "," + g + "," + b + ")";
 }
 function dj() {
-    draw(show_num,4);
+    draw(show_num, 4);
 }
 onMounted(() => {
     show_num = [];
-    draw(show_num,4);
+    draw(show_num, 4);
 }
 );
 
@@ -201,10 +211,10 @@ const recheckPassword = () => {
         verifyValid[3]['valid'] = false;
     }
 };//再次确认
-const openVerify = (index:number) => {
+const openVerify = (index: number) => {
     if (!verifyValid[index]['valid']) verifyValid[index]['show'] = true;
 };
-const closeVerify = (index:number) => {
+const closeVerify = (index: number) => {
     verifyValid[index]['show'] = false;
 };
 </script>
@@ -290,7 +300,7 @@ const closeVerify = (index:number) => {
                 <div class="remember-forgot">
                     <label><input type="checkbox">同意相关条款</label>
                 </div>
-                <div type="submit" class="btn">注册</div>
+                <div type="submit" class="btn" @click="test">注册</div>
                 <div class="login-register">
                     <span>已经拥有账户?<a href="#" class="login-link" @click="registerLink">去登陆</a></span>
                 </div>
@@ -316,6 +326,7 @@ const closeVerify = (index:number) => {
 
     &.active {
         height: 570px;
+
         .form-box {
             &.login {
                 transition: none;
@@ -397,12 +408,13 @@ const closeVerify = (index:number) => {
                 font-size: 1.2em;
                 line-height: 57px;
             }
+
             #ac {
                 position: absolute;
                 right: -20px;
                 font-size: 1.2em;
                 line-height: 57px;
-                color: rgb(40, 207, 40)!important;
+                color: rgb(40, 207, 40) !important;
             }
 
             &.code {
@@ -428,6 +440,7 @@ const closeVerify = (index:number) => {
                     cursor: pointer;
                 }
             }
+
             .validation {
                 width: 100%;
                 position: absolute;
@@ -555,6 +568,7 @@ const closeVerify = (index:number) => {
             span {
                 user-select: none;
                 font-weight: 520;
+
                 a {
                     @include font_color('text-100');
                     font-weight: 600;
