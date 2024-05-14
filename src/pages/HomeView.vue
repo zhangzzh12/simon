@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Aside from '@/components/Aside.vue';
-import { useThemeStyleStore } from '@/stores/data';
-import { useMenuStore } from '@/stores/menu';
+import { useThemeStyleStore } from '@/stores/Themedata';
+import { useMenuStore } from '@/stores/menuData';
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
 

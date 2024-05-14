@@ -8,9 +8,13 @@ const instance = axios.create({
 //请求拦截器
 instance.interceptors.request.use(
     (config) => {
-        const tokenstore = tokenStore()
+        const tokenstore = tokenStore();
+        console.log(tokenstore.token);
+        
         if (tokenstore.token) {
-            config.headers.Authorization = tokenstore.token
+            config.headers.Authorization = tokenstore.token;
+            console.log(tokenstore.token);
+            config.headers['ngrok-skip-browser-warning'] = 'true';
         }
         return config
     },

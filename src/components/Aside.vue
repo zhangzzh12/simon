@@ -4,7 +4,7 @@ import { reactive, ref } from 'vue';
 let aside_list = reactive([
   { id: 1, icon: 'bx-grid-alt', title: '首页', isactive: 'active', url: '/home' },
   { id: 2, icon: 'bx-cog', title: '仓库管理', isactive: '', url: '/home/warehouse' },
-  { id: 3, icon: 'bx-lemon', title: '货品管理', isactive: '', url: '/home/c' },
+  { id: 3, icon: 'bx-lemon', title: '货品管理', isactive: '', url: '/home/goodsManage' },
   { id: 4, icon: 'bx-cart-alt', title: '订单管理', isactive: '', url: '/home/d' },
   { id: 5, icon: 'bx-user', title: '客户管理', isactive: '', url: '/home/e' },
   { id: 6, icon: 'bx-credit-card', title: '商务人员管理', isactive: '', url: '/home/f' },
