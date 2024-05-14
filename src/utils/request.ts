@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { tokenStore } from '@/stores/tokenData.ts'
+import { ElMessage } from 'element-plus'
 const baseURL = 'https://eel-rapid-grizzly.ngrok-free.app'
 const instance = axios.create({
     baseURL,
@@ -27,7 +28,7 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     (res) => {
         if (res.data.code === 1) {
-            return res
+            return res.data
         }
         ElMessage.error(res.data.msg)
         return Promise.reject(res.data)

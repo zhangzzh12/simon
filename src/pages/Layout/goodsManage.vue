@@ -117,11 +117,11 @@ onMounted(() => {
          </el-form-item>
 
          <el-form-item label="售价" prop="outPriceLow">
-            <el-input v-model="formModel.outPriceLow"></el-input>
+            <el-input v-model="formModel.outPriceLow" style="width: 60px"></el-input>
          </el-form-item>
-         <span style="margin:0 5px;">-</span>
+         <span style="margin:0 1px;">-</span>
          <el-form-item prop="outPriceHigh">
-            <el-input v-model="formModel.outPriceHigh"></el-input>
+            <el-input v-model="formModel.outPriceHigh" style="width: 60px"></el-input>
          </el-form-item>
 
          <el-form-item label="种类">
@@ -133,13 +133,13 @@ onMounted(() => {
          </el-form-item>
 
          <el-form-item label="进价" prop="inPriceLow">
-            <el-input v-model="formModel.inPriceLow"></el-input>
+            <el-input v-model="formModel.inPriceLow" style="width: 100px"></el-input>
          </el-form-item>
 
          <span style="margin: 0 5px;">-</span>
 
          <el-form-item prop="inPriceHigh">
-            <el-input-number v-model="formModel.inPriceHigh"></el-input-number>
+            <el-input-number v-model="formModel.inPriceHigh" style="width: 100px"></el-input-number>
          </el-form-item>
 
          <div class="button" style="width:100px" @click="Query">查询</div>
@@ -153,32 +153,36 @@ onMounted(() => {
          <div class="button" style="margin-top: 20px; margin-bottom: 15px;width:100px">批量删除
          </div>
       </div>
-      <el-table border fit>
-         <el-table-column type="selection" align="center"></el-table-column>
-         <el-table-column align="center" label="货品名称"></el-table-column>
-         <el-table-column align="center" label="货品编号"></el-table-column>
-         <el-table-column align="center" label="售价"></el-table-column>
-         <el-table-column align="center" label="种类"></el-table-column>
-         <el-table-column align="center" label="进价"></el-table-column>
-         <el-table-column align="center" label="图片">
-            <template #default="{ row }">
-               <el-image :zoom-rate="1.2" :max-scale="7" :src="row.image" fit="fill" :min-scale="0.2"></el-image>
-            </template>
-         </el-table-column>
+      <div class="table-box">
+         <el-table border fit>
+            <el-table-column type="selection" align="center"></el-table-column>
+            <el-table-column align="center" label="货品名称"></el-table-column>
+            <el-table-column align="center" label="货品编号"></el-table-column>
+            <el-table-column align="center" label="售价"></el-table-column>
+            <el-table-column align="center" label="种类"></el-table-column>
+            <el-table-column align="center" label="进价"></el-table-column>
+            <el-table-column align="center" label="图片">
+               <template #default="{ row }">
+                  <el-image :zoom-rate="1.2" :max-scale="7" :src="row.image" fit="fill" :min-scale="0.2"></el-image>
+               </template>
+            </el-table-column>
 
-         <el-table-column align="center" label="操作">
-            <template #default="{ row }">
-               <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)" @click="editClick(row)">编辑
-               </el-button>
-               <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)">删除</el-button>
-            </template>
-         </el-table-column>
-      </el-table>
+            <el-table-column align="center" label="操作">
+               <template #default="{ row }">
+                  <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)" @click="editClick(row)">编辑
+                  </el-button>
+                  <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)">删除</el-button>
+               </template>
+            </el-table-column>
+         </el-table>
+      </div>
       <GoodsPanel ref="dialog" onSuccess="onSuccess"></GoodsPanel>
-      <el-pagination v-model:current-page="formModel.page" v-model:page-size="formModel.pageSize"
-         :page-sizes="[10, 20, 50, 100]" :background="true" layout="total, sizes, prev, pager, next, jumper"
-         :total="total" @size-change="onSizeChange" @current-change="onCurrentChange"
-         style="margin-top: 20px; justify-content: end" />
+      <div class="page-box">
+         <el-pagination v-model:current-page="formModel.page" v-model:page-size="formModel.pageSize"
+            :page-sizes="[10, 20, 50, 100]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+            :total="total" @size-change="onSizeChange" @current-change="onCurrentChange"
+            style="margin-top: 20px; justify-content: end" />
+      </div>
    </el-main>
    <el-footer>
       <div class="copyright">Copyright © , All Rights Reserved.</div>
@@ -193,22 +197,25 @@ onMounted(() => {
 
 </template>
 
-<style lang="scss" scoped>
+<style scoped lang="scss">
 .el-main {
-   margin: 30px
-}
-
-.el-form {
+   margin-top: 50px;
+   margin-bottom: 60px;
    display: flex;
-   justify-content: space-between;
-   margin-right: 5vh;
+   flex-direction: column;
+   gap: 20px;
+   padding: 0 30px;
+
+   .el-form {
+      display: flex;
+      justify-content: space-between;
+      margin-right: 5vh;
+      padding: 15px 25px;
+      border-radius: 12px;
+      box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
+   }
+
 }
-
-// .el-button {
-//    @include background_color('bg-300');
-//    outline: none;
-
-// }
 
 .button {
    min-width: 100px;
