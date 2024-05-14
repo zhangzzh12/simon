@@ -13,9 +13,8 @@ instance.interceptors.request.use(
         console.log(tokenstore.token);
         
         if (tokenstore.token) {
-            config.headers.Authorization = tokenstore.token;
-            console.log(tokenstore.token);
-            config.headers['ngrok-skip-browser-warning'] = 'true';
+            config.headers.Authorization = tokenstore.token
+            config.headers["ngrok-skip-browser-warning"] = 0
         }
         return config
     },
