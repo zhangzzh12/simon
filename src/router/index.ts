@@ -23,8 +23,8 @@ const router = createRouter({
                     component:()=>import("@/pages/Layout/A.vue"),
                 },
                 {
-                    path:'warehouse',
-                    component:()=>import("@/pages/Layout/warehouse.vue"),
+                    path:'warehouseManage',
+                    component:()=>import("@/pages/Layout/WarehouseManage.vue"),
                 },
                 {
                     path:'goodsManage',
@@ -35,8 +35,8 @@ const router = createRouter({
                     component:()=>import("@/pages/Layout/OrderManage.vue"),
                 },
                 {
-                    path:'e',
-                    component:()=>import("@/pages/Layout/E.vue"),
+                    path:'customerManage',
+                    component:()=>import("@/pages/Layout/CustomerManage.vue"),
                 },
                 {
                     path:'f',
