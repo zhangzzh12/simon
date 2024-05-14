@@ -4,10 +4,10 @@ import { reactive, ref } from 'vue';
 
 let aside_list = reactive([
   { id: 1, icon: 'bx-grid-alt', title: '首页', url: '/home' },
-  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/home/warehouse' },
+  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/home/warehouseManage' },
   { id: 3, icon: 'bx-lemon', title: '货品管理', url: '/home/goodsManage' },
-  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/home/d' },
-  { id: 5, icon: 'bx-user', title: '客户管理', url: '/home/e' },
+  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/home/orderManage' },
+  { id: 5, icon: 'bx-user', title: '客户管理', url: '/home/customerManage' },
   { id: 6, icon: 'bx-credit-card', title: '商务人员管理', url: '/home/f' },
   { id: 7, icon: 'bxs-backpack', title: '供货商管理', url: '/home/f' },
 ]);

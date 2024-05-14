@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { useThemeStyleStore } from '@/stores/Themedata';
+import { useMenuStore } from '@/stores/menuData';
+import { onMounted } from 'vue';
 
 const { themeStyle } = useThemeStyleStore();
 
@@ -16,11 +18,24 @@ let themeModelBtn = () => {
 // 主题色切换
 
 let nav_menu_list = [
-    { id: "1", title: "Home", icon: "bxs-home",url:'/home' },
-    { id: "2", title: "Products", icon: "bxs-package",url:'/' },
-    { id: "3", title: "About", icon: "bxs-heart",url:'/' },
-    { id: "4", title: "service", icon: "bxs-user-circle",url:'/' },
+    { id: "1", title: "Home", icon: "bxs-home", url: '/home' },
+    { id: "2", title: "Products", icon: "bxs-package", url: '/' },
+    { id: "3", title: "About", icon: "bxs-heart", url: '/' },
+    { id: "4", title: "service", icon: "bxs-user-circle", url: '/' },
 ];
+
+
+const { title,asideList_id } = useMenuStore();
+
+onMounted(() => {
+    title.first = '首页';
+    title.second = '';
+    for (let i = 0; i < asideList_id.length; ++i) {
+        asideList_id[i] = '';
+    }
+    asideList_id[1]='active';
+});
+
 </script>
 
 <template>
@@ -59,9 +74,10 @@ let nav_menu_list = [
 
 <style lang="scss" scoped>
 @import '../assets/scss/common.scss';
+
 .fade-enter-active,
 .fade-leave-active {
-     transition: opacity 1s;
+    transition: opacity 1s;
     // transition: height 1s;
 }
 
@@ -73,7 +89,9 @@ let nav_menu_list = [
 .fade-enter-from,
 .fade-leave-to {
     opacity: 0;
-}//路由跳转动画
+}
+
+//路由跳转动画
 
 //
 .login-main {
