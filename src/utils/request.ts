@@ -10,8 +10,6 @@ const instance = axios.create({
 instance.interceptors.request.use(
     (config) => {
         const tokenstore = tokenStore();
-        console.log(tokenstore.token);
-        
         if (tokenstore.token) {
             config.headers.Authorization = tokenstore.token
             config.headers["ngrok-skip-browser-warning"] = 0
@@ -26,14 +24,14 @@ instance.interceptors.request.use(
 //响应拦截器
 instance.interceptors.response.use(
     (res) => {
+        console.log(res)
         if (res.data.code === 1) {
-            return res.data
+            return res
         }
         ElMessage.error(res.data.msg)
         return Promise.reject(res.data)
     },
     (err) => {
-        ElMessage.error(err.response.data.message)
         return Promise.reject(err)
     }
 )

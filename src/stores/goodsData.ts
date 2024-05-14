@@ -8,10 +8,15 @@ export const useGoodsDataStore = defineStore('goods',()=>{
     inPrice:'',
     image:'',
     kind:'',
-    code:''
+    code:'',
+    packageSpe:'',
+    goodsStatus:''
   });
-  return {
+
+return {
   formInline,
 }
+},{
+  persist: true,// 是否选择持续化存储
 })
 

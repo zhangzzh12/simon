@@ -2,37 +2,73 @@
 import { onMounted, ref } from 'vue'
 import GoodsPanel from '@/components/GoodsPanel.vue'
 import { useMenuStore } from '@/stores/menuData';
+import { goodsGetService, goodsDeleteService } from '@/api/goods';
 const total = ref(0)
 const dialog = ref()
 const form = ref()
+const goodsList = ref([])
+const idList = ref([])
+const loading = ref(false)
 const goodsKind = ref([
    {
+      id:'',
+      name:'请选择'
+   },
+   {
       id: 1,
-      name: '食品类'
-   },
-   {
-      id: 2,
-      name: '服装类'
-   },
-   {
-      id: 3,
-      name: '鞋帽类'
-   },
-   {
-      id: 4,
       name: '日用品类'
    },
    {
+      id: 2,
+      name: '食品类'
+   },
+   {
+      id: 3,
+      name: '服装鞋帽类'
+   },
+   {
+      id: 4,
+      name: '饮料类'
+   },
+   {
       id: 5,
-      name: '家具类'
+      name: '烟草类'
    },
    {
       id: 6,
-      name: '家用电器类'
+      name: '药品类'
    },
    {
       id: 7,
-      name: '纺织品类'
+      name: '电子产品类'
+   },
+     {
+      id: 8,
+      name: '家用电器类'
+   },
+   {
+      id: 9,
+      name: '家居用品类'
+   },
+   {
+      id: 10,
+      name: '书籍文具类'
+   },
+   {
+      id: 11,
+      name: '化妆品类'
+   },
+   {
+      id: 12,
+      name: '运动户外用品类'
+   },
+   {
+      id: 13,
+      name: '汽车配件类'
+   },
+   {
+      id: 14,
+      name: '宠物用品类'
    }
 ])
 const formModel = ref({
@@ -47,17 +83,48 @@ const formModel = ref({
 })
 
 const countValidator = (rule, value, callback) => {
-   if (Number(value) < 0) {
-      return callback(new Error('价格不得小于0'))
-   } else {
+   if( value !==''&& !/^\d+(\.\d+)?$/.test(value) ){
+      return callback(new Error('请输入正数'))
+   }else {
       return callback()
    }
 }
-const minValidator = () => {
+const minValidator = (rule, value, callback) => {
+   const lowPrice = Number(value);
+   const highPrice = Number(formModel.value.outPriceHigh);
+   if (!highPrice || lowPrice <= highPrice) {
+      return callback();
+   }
+   callback(new Error('售价最小值不得大于售价最大值'));
+};
 
+const maxValidator = (rule, value, callback) => {
+   const highPrice = Number(value);
+   const lowPrice = Number(formModel.value.outPriceLow);
+   if (!lowPrice || lowPrice <= highPrice) {
+      return callback();
+   }
+   else {
+      callback(new Error('售价最大值不得小于售价最小值'));
+   }
+};
+const minValidator1 = (rule, value, callback) => {
+    const lowPrice = Number(value);
+    const highPrice = Number(formModel.value.inPriceHigh);
+   if (!highPrice || lowPrice <= highPrice) {
+      return callback();
+   }
+   callback(new Error('售价最小值不得大于售价最大值'));
 }
-const maxValidator = () => {
-
+const maxValidator1 = (rule, value, callback) => {
+   const highPrice = Number(value);
+   const lowPrice = Number(formModel.value.inPriceLow);
+   if (!lowPrice || lowPrice <= highPrice) {
+      return callback();
+   }
+   else {
+      callback(new Error('售价最大值不得小于售价最小值'));
+   }
 }
 const rules = {
    outPriceLow: [
@@ -70,14 +137,35 @@ const rules = {
    ],
    inPriceLow: [
       { validator: countValidator, trigger: 'blur' },
-      { validator: minValidator, trigger: 'blur' }
+      { validator: minValidator1, trigger: 'blur' }
    ],
    inPriceHigh: [
       { validator: countValidator, trigger: 'blur' },
-      { validator: maxValidator, trigger: 'blur' }
+      { validator: maxValidator1, trigger: 'blur' }
    ]
 }
+const selectionLineChangeHandle = (rows) => {
+   rows.forEach(row => {
+    const id = row.id;
+    if (!idList.value.includes(id)) {
+      idList.value.push(id);
+    }
+  });
+}
+
+const findById = (id:number) => {
+   const kind = goodsKind.value.find(item => item.id === id);
+   return kind ? kind.name :''; 
+}
 const getGoods = async () => {
+   loading.value = true
+   const res = await goodsGetService(formModel.value)
+   total.value = res.data.data.total
+   goodsList.value = res.data.data.rows
+   goodsList.value.forEach(item=>{
+      item.kind = findById(item.kind)
+   })
+   loading.value = false
 }
 
 const onSizeChange = (size: number) => {
@@ -94,10 +182,33 @@ const addClick = (row) => {
 const editClick = (row) => {
    dialog.value.open(row, '编辑货品')
 }
-const onSuccess = () => {
+const delClick = async (row) => {
+   await ElMessageBox.confirm('您确定要删除该货品信息吗', '删除货品信息', {
+    type: 'warning',
+    confirmButtonText: '确定',
+    cancelButtonText: '取消'
+  })
+   await goodsDeleteService(row.id)
    getGoods()
 }
-const Query = () => {
+const delAllClick =async () => {
+   if(idList.value.length === 0){
+      ElMessage.warning('请选择要删除的员工')
+   }else{
+      await ElMessageBox.confirm('您确定要删除该货品信息吗', '删除货品信息', {
+         type: 'warning',
+         confirmButtonText: '确定',
+         cancelButtonText: '取消'
+      })
+      await goodsDeleteService(idList.value)
+      getGoods()
+   }
+}
+const Query = async() => {
+   await getGoods()
+}
+const onSuccess = () =>{
+   getGoods()
 }
 getGoods()
 
@@ -111,17 +222,22 @@ onMounted(() => {
 
 <template>
    <el-main>
-      <el-form :rules="rules" ref="form" :model="formModel" style="display: flex; align-items: center;">
+      <el-form 
+         :rules="rules" ref="form" :model="formModel" style="display: flex; 
+         align-items: center;">
+
          <el-form-item label="名称">
-            <el-input placeholder="请输入货品名称" v-model="formModel.name" style="width: 120px"></el-input>
+            <el-input 
+              placeholder="请输入货品名称" clearable
+              v-model="formModel.name" style="width: 120px"></el-input>
          </el-form-item>
 
          <el-form-item label="售价" prop="outPriceLow">
-            <el-input v-model="formModel.outPriceLow" style="width: 60px"></el-input>
+            <el-input v-model="formModel.outPriceLow" style="width: 100px" clearable></el-input>
          </el-form-item>
-         <span style="margin:0 1px;">-</span>
+         <span style="margin:0 -15px;">-</span>
          <el-form-item prop="outPriceHigh">
-            <el-input v-model="formModel.outPriceHigh" style="width: 60px"></el-input>
+            <el-input v-model="formModel.outPriceHigh" style="width: 100px" clearable></el-input>
          </el-form-item>
 
          <el-form-item label="种类">
@@ -133,37 +249,41 @@ onMounted(() => {
          </el-form-item>
 
          <el-form-item label="进价" prop="inPriceLow">
-            <el-input v-model="formModel.inPriceLow" style="width: 100px"></el-input>
+            <el-input v-model="formModel.inPriceLow" style="width: 100px" clearable></el-input>
          </el-form-item>
-
-         <span style="margin: 0 5px;">-</span>
-
+         <span style="margin: 0 -15px;">-</span>
          <el-form-item prop="inPriceHigh">
-            <el-input-number v-model="formModel.inPriceHigh" style="width: 100px"></el-input-number>
+            <el-input v-model="formModel.inPriceHigh" style="width: 100px" clearable></el-input>
          </el-form-item>
 
          <div class="button" style="width:100px" @click="Query">查询</div>
-
       </el-form>
       <div class="button-box" style="display: flex;align-items: center;">
 
          <div class="button" style="margin-top: 20px; margin-bottom: 15px; width:100px " @click="addClick">新增货品
          </div>
 
-         <div class="button" style="margin-top: 20px; margin-bottom: 15px;width:100px">批量删除
+         <div class="button" style="margin-top: 20px; margin-bottom: 15px;width:100px" @click="delAllClick">批量删除
          </div>
       </div>
+
       <div class="table-box">
-         <el-table border fit>
-            <el-table-column type="selection" align="center"></el-table-column>
-            <el-table-column align="center" label="货品名称"></el-table-column>
-            <el-table-column align="center" label="货品编号"></el-table-column>
-            <el-table-column align="center" label="售价"></el-table-column>
-            <el-table-column align="center" label="种类"></el-table-column>
-            <el-table-column align="center" label="进价"></el-table-column>
-            <el-table-column align="center" label="图片">
+         <el-table border fit v-loading="loading" :data="goodsList" @selection-change="selectionLineChangeHandle"> 
+            <el-table-column type="selection" align="center"  prop="id"></el-table-column>
+            <el-table-column align="center" label="货品名称" prop="name"></el-table-column>
+            <el-table-column align="center" label="货品编号" prop="code"></el-table-column>
+            <el-table-column align="center" label="售价" prop="outPrice"></el-table-column>
+            <el-table-column align="center" label="种类" prop="kind"></el-table-column>
+            <el-table-column align="center" label="进价" prop="inPrice"></el-table-column>
+            <el-table-column align="center" label="图片" prop="image">
                <template #default="{ row }">
-                  <el-image :zoom-rate="1.2" :max-scale="7" :src="row.image" fit="fill" :min-scale="0.2"></el-image>
+                  <el-image 
+                     :zoom-rate="1.2" 
+                     :max-scale="7" 
+                     :src="row.image"
+                     fit="cover"
+                     :min-scale="0.2"
+                  ></el-image>
                </template>
             </el-table-column>
 
@@ -171,12 +291,12 @@ onMounted(() => {
                <template #default="{ row }">
                   <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)" @click="editClick(row)">编辑
                   </el-button>
-                  <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)">删除</el-button>
+                  <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)" @click="delClick(row)">删除</el-button>
                </template>
             </el-table-column>
          </el-table>
       </div>
-      <GoodsPanel ref="dialog" onSuccess="onSuccess"></GoodsPanel>
+         <GoodsPanel ref="dialog" @success="onSuccess"></GoodsPanel>
       <div class="page-box">
          <el-pagination v-model:current-page="formModel.page" v-model:page-size="formModel.pageSize"
             :page-sizes="[10, 20, 50, 100]" :background="true" layout="total, sizes, prev, pager, next, jumper"
