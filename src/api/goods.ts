@@ -4,3 +4,15 @@ export const goodsGetService = (params:object) =>{
     params
   })
 }
+
+export const goodsDeleteService = (id) => {
+  return request.delete(`/goods/${id}`)
+}
+
+export const goodsPostService = (data) => {
+  return request.post('/goods',data)
+}
+
+export const goodsPutService = (data) => {
+  return request.put('/goods', data)
+}

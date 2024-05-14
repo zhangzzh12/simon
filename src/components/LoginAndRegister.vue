@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import axios from 'axios';
-import { tokenStore } from '@/stores/tokenData';
+import { tokenStore } from '@/stores/tokenData.ts';
 import request from '@/utils/request.ts';
 const http = axios.create({
     baseURL: 'https://eel-rapid-grizzly.ngrok-free.app',
@@ -23,9 +23,8 @@ let value = '';
 const sublim = async () => {
     let num = show_num.join("");
     if (!value) return alert('请输入验证码！');
-    if (value == num) {
+    if (value === num) {
         const res = await request.post('/login', user);
-        //    await http.get('/warehouse',{params:{page:1,pageSize:10}});
         const tokenstore = tokenStore();
         tokenstore.token = res.data.data;
         console.log(tokenstore.token);
