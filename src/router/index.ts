@@ -20,7 +20,7 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    component: () => import("@/pages/Layout/A.vue"),
+                    component: () => import("@/pages/Layout/HomeStatistics.vue"),
                 },
                 {
                     path:'warehouseManage',
