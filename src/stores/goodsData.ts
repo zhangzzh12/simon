@@ -12,11 +12,10 @@ export const useGoodsDataStore = defineStore('goods',()=>{
     packageSpe:'',
     goodsStatus:''
   });
-
 return {
   formInline,
 }
 },{
   persist: true,// 是否选择持续化存储
-})
+});
 

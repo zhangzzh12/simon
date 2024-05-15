@@ -2,6 +2,21 @@
 import * as echarts from 'echarts';
 import { reactive, defineProps,ref,watch, onMounted } from 'vue';
 
+const goodsName = ref([
+    '日用品类',
+    '食品类',
+    '服装鞋帽类',
+    '饮料类',
+    '烟草类',
+    '药品类',
+    '电子产品类',
+    '家用电器类',
+    '家居用品类',
+    '书籍文具类',
+     '化妆品类',
+     '运动户外用品类',
+     '汽车配件类','宠物用品类',
+])
 const props = defineProps({
     chartTitle: {
         type: String,
@@ -9,15 +24,7 @@ const props = defineProps({
     chartData:{
         type:Array,
     },
-    chartX:{
-        type:Array,
-    },
 });
-// watch(props.chartData,(newValue,oldValue)=>{
-//     if(newValue.length>0){
-//         initChart();
-//     }
-// });
 
 const chart = ref();//dom引用
 
@@ -40,9 +47,15 @@ const option = reactive({
         data: ['箱数'],
         left:'left',
     },
-    xAxis: {
-        data: props.chartX,
-    },
+    xAxis: [
+        {
+        axisLabel:{
+            interval:0,
+            rotate:45
+        },    
+        data: goodsName.value,
+    }
+],
     yAxis: {},
     series: [
         {
@@ -54,6 +67,7 @@ const option = reactive({
 });
 
 const initChart = () => {
+    option.series[0].data = props.chartData
     let myChart = echarts.init(chart.value);
     myChart.setOption(option);
     //图表自适应
@@ -61,7 +75,12 @@ const initChart = () => {
         myChart.resize();
     });
 };
+watch(props.chartData, (newData) => {
+  option.series[0].data = newData;
+  initChart()
+});
 onMounted(()=>{
+    option.series[0].data = props.chartData
     initChart();
 });
 </script>

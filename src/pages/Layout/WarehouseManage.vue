@@ -2,13 +2,87 @@
 import { ref, reactive, onMounted } from 'vue';
 import BarChart from '@/components/chart/BarChart.vue';
 import { useMenuStore } from '@/stores/menuData';
+import { warehouseGetService, warehouseCountGetService, warehousePostService, inwarehousePostService, outwarehousePostService } from '@/api/warehouse';
 import WarehousePanel from '@/components/WarehousePanel.vue';
+import OutwarehousePanel from '@/components/OutwarehousePanel.vue';
+import InwarehousePanel from '@/components/InwarehousePanel.vue';
+import { useWareDataStore } from '@/stores/WarehouseData';
+const { formInline } = useWareDataStore(); 
+const useWareData = useWareDataStore();
+// 种类列表
+const goodsKind = ref([
+   {
+      id:'',
+      name:'请选择'
+   },
+   {
+      id: 1,
+      name: '日用品类'
+   },
+   {
+      id: 2,
+      name: '食品类'
+   },
+   {
+      id: 3,
+      name: '服装鞋帽类'
+   },
+   {
+      id: 4,
+      name: '饮料类'
+   },
+   {
+      id: 5,
+      name: '烟草类'
+   },
+   {
+      id: 6,
+      name: '药品类'
+   },
+   {
+      id: 7,
+      name: '电子产品类'
+   },
+     {
+      id: 8,
+      name: '家用电器类'
+   },
+   {
+      id: 9,
+      name: '家居用品类'
+   },
+   {
+      id: 10,
+      name: '书籍文具类'
+   },
+   {
+      id: 11,
+      name: '化妆品类'
+   },
+   {
+      id: 12,
+      name: '运动户外用品类'
+   },
+   {
+      id: 13,
+      name: '汽车配件类'
+   },
+   {
+      id: 14,
+      name: '宠物用品类'
+   }
+])
+// 仓库货品数量列表
+const goodsCountList = ref([])
+const mergedData = ref()
+const num = ref(0)
 // 查询量
 const search_date = reactive({
+    page:'',
+    pageSize:'',
+    warehouseNum:0,
     name: '',
-    gender: '',
-    entrydate: '',
-    ledgerdate: '',
+    kind:''
 });
 //加载值
 const loading = ref(false);
@@ -18,10 +92,6 @@ const page_index = ref(1);
 const page_data_value = ref(10);
 const total_page_number = ref(0);
 const page_data_number = [
-    {
-        value: 5,
-        label: 5,
-    },
     {
         value: 10,
         label: 10,
@@ -41,25 +111,112 @@ const page_data_number = [
 ];
 
 // 表格数据
-const tableData = ref([]);
+const tableData = ref();
 const tableTitle = [
     { props: 'name', label: '货品名称' },
-    { props: 'gender', label: '性别' },
-    { props: 'job', label: '职位' },
-    { props: 'entrydate', label: '入职日期' },
-    { props: 'updateTime', label: '最后操作时间' },
+    { props: 'code', label: '编码' },
+    { props: 'number', label: '数量' },
 ];
+
+//获取货品信息
+const goodsGet = async () => {
+    loading.value = true
+    const res = await warehouseGetService(search_date)
+    total_page_number.value = res.data.data.total
+    tableData.value = res.data.data.rows
+    loading.value = false
+}
+//获取仓库信息
+const countList = async () => {
+    const res = await warehouseCountGetService(search_date.warehouseNum)
+    goodsCountList.value = res.data.data
+    mergedData.value = goodsKind.value.slice(1).map((item, index) => ({
+        name: item.name,
+        value: goodsCountList.value[index]
+    }));
+    console.log(mergedData.value)
+}
+//查询货品 
+const Query = () => {
+    goodsGet()
+}
+const onSubmit = async () => {
+    console.log(formInline)
+    await warehousePostService(formInline)
+    goodsGet()
+    dialogVisible.value = false
+}
+//添加货品
+const addGoods = () => {
+    formInline.id = 0
+    formInline.name = ''
+    formInline.inPrice = ''
+    formInline.kind = ''
+    formInline.location = 0
+    formInline.code = ''
+    formInline.number = ''
+    dialogVisible.value = true
+}
+const inWarehouse = async (row) => {
+    formInline.id = row.id
+    formInline.name = ''
+    formInline.inPrice = ''
+    formInline.kind = ''
+    formInline.location = 0
+    formInline.code = row.code
+    formInline.number = ''
+    inWarehouseVisible.value = true
+}
+const outWarehouse = async (row) => {
+    formInline.id = row.id
+    formInline.name = ''
+    formInline.inPrice = ''
+    formInline.kind = ''
+    formInline.location = 0
+    formInline.code = row.code
+    formInline.number = ''
+    num.value = row.number
+    useWareData.houseNumber = row.number
+    outWarehouseVisible.value = true
+}
+const inWarehouseOperation = async () => {
+    console.log(formInline)
+    if(Number(formInline.number)<0){
+        alert("入库数量不能为负数");
+    }else {
+        await inwarehousePostService(formInline)
+        goodsGet()
+        inWarehouseVisible.value = false
+    }
+
+}
+const outWarehouseOperation = async () => {
+    if(Number(formInline.number)>num.value){
+        alert("出库数量不能超过库存数量！");
+    }else if(Number(formInline.number)<0){
+         alert("入库数量不能为负数");
+    }else {
+        await outwarehousePostService(formInline)
+        goodsGet()
+        outWarehouseVisible.value = false   
+    }
+}
 
 //面包屑
 const { title } = useMenuStore();
 onMounted(() => {
     title.first = '仓库管理';
     title.second = '店铺';
+    goodsGet()
+    countList()
 });
-
 
 //新增货品项
 const dialogVisible = ref(false);
+//入库
+const inWarehouseVisible = ref(false);
+//出库
+const outWarehouseVisible = ref(false);
 </script>
 
 <template>
@@ -69,8 +226,8 @@ const dialogVisible = ref(false);
                 <el-main>
                     <section class="statistic-box">
                         <div class="bar-box">
-                            <BarChart chartTitle="仓位速览" :chartX="['A货', 'B货']"
-                                :chartData="[{ value: 15, name: 'A货' }, { value: 15, name: 'B货' },]" />
+                            <BarChart chartTitle="仓位速览"
+                                :chartData="goodsCountList" />
                         </div>
                     </section>
                     <section class="data-box">
@@ -82,16 +239,16 @@ const dialogVisible = ref(false);
                                 </div>
                                 <div class="input-box">
                                     <span>种类</span>
-                                    <el-select v-model="search_date.gender" placeholder="请选择" style="width: 100px;">
-                                        <el-option label="男" value=1 />
-                                        <el-option label="女" value=2 />
-                                        <el-option label="全部" value='' />
+                                    <el-select v-model="search_date.kind" placeholder="请选择" style="width: 100px;">
+                                        <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
+                                        :label="goods.name">
+                                        </el-option>
                                     </el-select>
                                 </div>
-                                <div class="button" @click="">查询</div>
+                                <div class="button" @click="Query">查询</div>
                             </form>
                             <section class="button-box">
-                                <div class="button" @click="dialogVisible = true">+ 新增货品项</div>
+                                <div class="button" @click="addGoods">+ 新增货品项</div>
                             </section>
                             <section class="table-box">
                                 <el-table ref="multipleTableRef" :data="tableData" table-layout="auto"
@@ -99,9 +256,9 @@ const dialogVisible = ref(false);
                                     <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label"
                                         align="center" />
                                     <el-table-column label="操作" align="center">
-                                        <template #default="scope">
-                                            <el-button type="primary" size="small" @click.prevent="">入库</el-button>
-                                            <el-button link type="primary" size="small" @click.prevent="">出库</el-button>
+                                        <template #default=" {row} ">
+                                            <el-button type="primary" size="small" @click.prevent="inWarehouse(row)">入库</el-button>
+                                            <el-button link type="primary" size="small" @click.prevent="outWarehouse(row)">出库</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
@@ -124,11 +281,31 @@ const dialogVisible = ref(false);
                                     </div>
                                 </div>
                             </section>
-                            <el-dialog v-model="dialogVisible" width="350">
-                                <WarehousePanel title="新增学员">
+                            <el-dialog v-model="inWarehouseVisible" width="380">
+                                <InwarehousePanel title="入库" >
                                     <template v-slot:button>
                                         <div class="button-box">
-                                            <div class="button">新增</div>
+                                            <div class="button" @click="inWarehouseOperation">入库</div>
+                                            <div class="button" @click="inWarehouseVisible = false">取消</div>
+                                        </div>
+                                    </template>
+                                </InwarehousePanel>
+                            </el-dialog>
+                            <el-dialog v-model="outWarehouseVisible" width="380">
+                                <OutwarehousePanel title="出库">
+                                    <template v-slot:button>
+                                        <div class="button-box">
+                                            <div class="button" @click="outWarehouseOperation">出库</div>
+                                            <div class="button" @click="outWarehouseVisible = false">取消</div>
+                                        </div>
+                                    </template>
+                                </OutwarehousePanel>
+                            </el-dialog>
+                            <el-dialog v-model="dialogVisible" width="380">
+                                <WarehousePanel title="新增货品">
+                                    <template v-slot:button>
+                                        <div class="button-box">
+                                            <div class="button" @click="onSubmit">新增</div>
                                             <div class="button" @click="dialogVisible = false">取消</div>
                                         </div>
                                     </template>
@@ -138,7 +315,7 @@ const dialogVisible = ref(false);
                         <div class="ledger-box">
                             <form class="input-form">
                                 <el-form-item label="入职时间">
-                                    <el-date-picker v-model="search_date.ledgerdate" type="date" placeholder="请选择入职时间"
+                                    <el-date-picker type="date" placeholder="请选择入职时间"
                                         value-format="YYYY-MM-DD" clearable style="width: 200px;" />
                                 </el-form-item>
                                 <div class="button" @click="">查询</div>

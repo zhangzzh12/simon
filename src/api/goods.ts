@@ -16,3 +16,7 @@ export const goodsPostService = (data) => {
 export const goodsPutService = (data) => {
   return request.put('/goods', data)
 }
+
+export const goodsChaService = (id) => {
+  return request.get(`/goods/${id}`)
+}
