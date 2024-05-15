@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, defineEmits, onMounted } from 'vue'
 import { useGoodsDataStore } from '@/stores/goodsData'
-import { goodsPostService, goodsPutService } from '@/api/goods';
+import { goodsPostService, goodsPutService, goodsChaService } from '@/api/goods';
 import { imagePostService } from '@/api/upload';
-const { formInline, setformInline, removeformInline } = useGoodsDataStore()
+const { formInline } = useGoodsDataStore()
 const dialogVisible = ref(false)
 const tile = ref('')
 const goodsKind = ref([
@@ -82,15 +82,31 @@ const rules = {
 }
 
 const open = async (row,title) => {
-  tile.value=title
-  if(tile.value==='编辑货品'){
-
-  }
-  else{
-
+  tile.value = title
+  formInline.id = ''
+  formInline.name = ''
+  formInline.outPrice = ''
+  formInline.inPrice = ''
+  formInline.image = ''
+  formInline.kind = ''
+  formInline.code = ''
+  formInline.packageSpe = ''
+  formInline.goodsStatus = ''
+  if(tile.value ==='编辑货品'){
+    const res = await goodsChaService(row.id)
+      formInline.id = res.data.data.id
+      formInline.name = res.data.data.name
+      formInline.outPrice = res.data.data.outPrice
+      formInline.inPrice = res.data.data.inPrice
+      formInline.image = res.data.data.image
+      formInline.kind = res.data.data.kind
+      formInline.code = res.data.data.code
+      formInline.packageSpe = res.data.data.packageSpe
+      formInline.goodsStatus = res.data.data.goodsStatus
   }
   dialogVisible.value=true
-} 
+}
+
 defineExpose({
   open
 })
@@ -119,12 +135,11 @@ const onSelectFile = async (uploadFile) => {
   }
 }
 const onSubmit = async () => {
-  if(formModel.value.id!==''){
-    console.log(formInline.id)
-    await goodsPutService(formInline)
-  }else {
-    console.log(formInline.id)
+  if(formInline.id === ''){
     await goodsPostService(formInline)
+  }
+  else{
+    await goodsPutService(formInline)
   }
   dialogVisible.value = false
   emit('success')
@@ -138,7 +153,7 @@ const onSubmit = async () => {
     </div>
     <el-form :model="formInline" class="demo-form-inline" label-position="right" label-width="auto"
         ref="ruleFormRef" :rules=rules>
-        <el-form-item label="货品名称" prop="name">
+        <el-form-item label="货品名称">
             <el-input v-model="formInline.name" placeholder="请输入货品名称" clearable />
         </el-form-item>        
         <el-form-item label="货品进价" prop="inPrice">
@@ -161,7 +176,7 @@ const onSubmit = async () => {
       </el-upload>
     </el-form-item>
 
-        <el-form-item label="货品种类" prop="kind">
+        <el-form-item label="货品种类">
           <el-select placeholder="请选择货品的种类" v-model="formInline.kind">
             <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
               :label="goods.name">
@@ -173,11 +188,11 @@ const onSubmit = async () => {
             <el-input v-model="formInline.code" placeholder="请输入货品编号" clearable />
         </el-form-item>
 
-        <el-form-item label="货品包装规格" prop="packageSpe">
+        <el-form-item label="货品包装规格">
             <el-input v-model="formInline.packageSpe" placeholder="请输入货品包装规格" clearable />
         </el-form-item>
 
-        <el-form-item label="货品状态" prop="goodsStatus">
+        <el-form-item label="货品状态">
             <el-input v-model="formInline.goodsStatus" placeholder="请输入货品状态" clearable />
         </el-form-item>
 

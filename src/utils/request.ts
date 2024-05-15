@@ -25,7 +25,6 @@ instance.interceptors.request.use(
 //响应拦截器
 instance.interceptors.response.use(
     (res) => {
-        console.log(res)
         if (res.data.code === 1) {
             return res
         }
