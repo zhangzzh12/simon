@@ -4,7 +4,6 @@ import { onMounted, ref, reactive } from 'vue';
 import OrderPanel from '@/components/OrderPanel.vue';
 import { allOrderGetService, checkOrderpostService, orderGetService, returnOrderpostService } from '@/api/order';
 import { useOrderDataStore } from '@/stores/orderData';
-import { ElMessage } from 'element-plus';
 
 
 const { title } = useMenuStore();
@@ -76,6 +75,10 @@ const clean = () => {
 const order_status = ['未审核', '已审核', '已退货'];
 
 const getOrderItem = () => {
+    if (!orderList.value) {
+        clean();
+        return;
+    }
     let order_item = orderList.value[page_index.value - 1];
     for (let i = 0; i < order_item.nameList.length; ++i) {
         tableData.value[i] = { name: '', number: 1, price: 1, goodsCode: '' };
@@ -154,7 +157,7 @@ const emitsGetvisible = (data: boolean) => {
 const prev = () => {
     if (page_index.value > 1) {
         page_index.value--;
-        getorder();
+        getOrderItem();
     } else {
         ElMessage.warning('已到达最新订单！');
     }
@@ -163,7 +166,7 @@ const prev = () => {
 const next = () => {
     if (page_index.value < total_page_number.value) {
         page_index.value++;
-        getorder();
+        getOrderItem();
     } else {
         ElMessage.warning('已到达最早订单！');
     }
@@ -178,7 +181,7 @@ const jumpTo = () => {
         page_index.value = 1;
         ElMessage.warning('操作溢出，已修正');
     }
-    getorder();
+    getOrderItem();
 };
 
 //退货
@@ -247,8 +250,11 @@ const check = async () => {
                         <div class="button refund" @click="returnVisible = true">退货</div>
                         <div class="button refund" @click="checkVisible = true">审核</div>
                         <div class="button" @click="next">下一页</div>
-                        <span>当前页面：</span><input class="page-index" type="number" @blur="jumpTo" v-model="page_index" />
-                        <div class="total-data">共有{{ total_page_number }}单</div>
+                        <div class="wrapper">
+                            <span>当前页面：</span><input class="page-index" type="number" @blur="jumpTo"
+                                v-model="page_index" />
+                            <div class="total-data">共有{{ total_page_number }}单</div>
+                        </div>
                     </section>
                     <el-dialog v-model="dialogVisible" width="600" draggable>
                         <OrderPanel title="销售单结账进行中" @getvisible="emitsGetvisible" />
@@ -391,38 +397,47 @@ const check = async () => {
             &.page {
                 justify-content: space-between;
                 align-items: center;
-                padding: 0 20%;
+                padding: 0 10%;
 
-                span {
-                    @include font_color('tetx-100');
-                    font-weight: 600;
-                    white-space: nowrap;
-                }
-
-                .total-data {
-                    box-shadow: 0 0 10px rgba(49, 61, 68, .8);
-                    padding: 8px 10px;
+                .wrapper {
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
                     border-radius: 12px;
-                    @include background_color('primary-200');
-                    white-space: nowrap;
-                    color: white;
-                }
+                    padding: 10px;
 
-                .page-index {
-                    width: 60px;
-                    padding: 0 10px;
-                    height: 35px;
-                    outline: none;
-                    border: none;
-                    @include background_color('accent-200');
-                    color: white;
-                    font-size: 16px;
-                    border-radius: 5px;
-                    transition: all .3s ease;
-                    margin-right: 80px;
-                    box-shadow: 0 0 4px rgba(49, 61, 68, .5);
-                    text-align: center;
-                    line-height: 35px;
+                    span {
+                        @include font_color('tetx-100');
+                        font-weight: 600;
+                        white-space: nowrap;
+                    }
+
+                    .total-data {
+                        box-shadow: 0 0 10px rgba(49, 61, 68, .8);
+                        padding: 8px 10px;
+                        border-radius: 12px;
+                        @include background_color('primary-200');
+                        white-space: nowrap;
+                        color: white;
+                    }
+
+                    .page-index {
+                        width: 60px;
+                        padding: 0 10px;
+                        height: 35px;
+                        outline: none;
+                        border: none;
+                        @include background_color('accent-200');
+                        color: white;
+                        font-size: 16px;
+                        border-radius: 5px;
+                        transition: all .3s ease;
+                        margin-right: 80px;
+                        box-shadow: 0 0 4px rgba(49, 61, 68, .5);
+                        text-align: center;
+                        line-height: 35px;
+                    }
                 }
             }
         }

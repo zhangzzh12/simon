@@ -11,8 +11,8 @@ const idList = ref([])
 const loading = ref(false)
 const goodsKind = ref([
    {
-      id:'',
-      name:'请选择'
+      id: '',
+      name: '请选择'
    },
    {
       id: 1,
@@ -42,7 +42,7 @@ const goodsKind = ref([
       id: 7,
       name: '电子产品类'
    },
-     {
+   {
       id: 8,
       name: '家用电器类'
    },
@@ -83,9 +83,9 @@ const formModel = ref({
 })
 
 const countValidator = (rule, value, callback) => {
-   if( value !==''&& !/^\d+(\.\d+)?$/.test(value) ){
+   if (value !== '' && !/^\d+(\.\d+)?$/.test(value)) {
       return callback(new Error('请输入正数'))
-   }else {
+   } else {
       return callback()
    }
 }
@@ -109,8 +109,8 @@ const maxValidator = (rule, value, callback) => {
    }
 };
 const minValidator1 = (rule, value, callback) => {
-    const lowPrice = Number(value);
-    const highPrice = Number(formModel.value.inPriceHigh);
+   const lowPrice = Number(value);
+   const highPrice = Number(formModel.value.inPriceHigh);
    if (!highPrice || lowPrice <= highPrice) {
       return callback();
    }
@@ -146,23 +146,23 @@ const rules = {
 }
 const selectionLineChangeHandle = (rows) => {
    rows.forEach(row => {
-    const id = row.id;
-    if (!idList.value.includes(id)) {
-      idList.value.push(id);
-    }
-  });
+      const id = row.id;
+      if (!idList.value.includes(id)) {
+         idList.value.push(id);
+      }
+   });
 }
 
-const findById = (id:number) => {
+const findById = (id: number) => {
    const kind = goodsKind.value.find(item => item.id === id);
-   return kind ? kind.name :''; 
+   return kind ? kind.name : '';
 }
 const getGoods = async () => {
    loading.value = true
    const res = await goodsGetService(formModel.value)
    total.value = res.data.data.total
    goodsList.value = res.data.data.rows
-   goodsList.value.forEach(item=>{
+   goodsList.value.forEach(item => {
       item.kind = findById(item.kind)
    })
    loading.value = false
@@ -185,17 +185,17 @@ const editClick = (row) => {
 }
 const delClick = async (row) => {
    await ElMessageBox.confirm('您确定要删除该货品信息吗', '删除货品信息', {
-    type: 'warning',
-    confirmButtonText: '确定',
-    cancelButtonText: '取消'
-  })
+      type: 'warning',
+      confirmButtonText: '确定',
+      cancelButtonText: '取消'
+   })
    await goodsDeleteService(row.id)
    getGoods()
 }
-const delAllClick =async () => {
-   if(idList.value.length === 0){
+const delAllClick = async () => {
+   if (idList.value.length === 0) {
       ElMessage.warning('请选择要删除的员工')
-   }else{
+   } else {
       await ElMessageBox.confirm('您确定要删除该货品信息吗', '删除货品信息', {
          type: 'warning',
          confirmButtonText: '确定',
@@ -205,68 +205,67 @@ const delAllClick =async () => {
       getGoods()
    }
 }
-const Query = async() => {
+const Query = async () => {
    await getGoods()
 }
-const onSuccess = () =>{
+const onSuccess = () => {
    getGoods()
 }
-getGoods()
 
 //面包屑
 const { title } = useMenuStore();
 onMounted(() => {
    title.first = '货品管理';
    title.second = '';
+   getGoods();
 });
 </script>
 
 <template>
-   <el-main>
-      <el-form 
-         :rules="rules" ref="form" :model="formModel" style="display: flex; 
+   <div class="common-layout home-section">
+      <el-scrollbar>
+         <el-main>
+            <el-form :rules="rules" ref="form" :model="formModel" style="display: flex; 
          align-items: center;">
 
-         <el-form-item label="名称">
-            <el-input 
-              placeholder="请输入货品名称" clearable
-              v-model="formModel.name" style="width: 120px"></el-input>
-         </el-form-item>
+               <el-form-item label="名称">
+                  <el-input placeholder="请输入货品名称" clearable v-model="formModel.name" style="width: 120px"></el-input>
+               </el-form-item>
 
-         <el-form-item label="售价" prop="outPriceLow">
-            <el-input v-model="formModel.outPriceLow" style="width: 100px" clearable></el-input>
-         </el-form-item>
-         <span style="margin:0 -15px;">-</span>
-         <el-form-item prop="outPriceHigh">
-            <el-input v-model="formModel.outPriceHigh" style="width: 100px" clearable></el-input>
-         </el-form-item>
+               <el-form-item label="售价" prop="outPriceLow">
+                  <el-input v-model="formModel.outPriceLow" style="width: 100px" clearable></el-input>
+               </el-form-item>
+               <span style="margin:0 -15px;">-</span>
+               <el-form-item prop="outPriceHigh">
+                  <el-input v-model="formModel.outPriceHigh" style="width: 100px" clearable></el-input>
+               </el-form-item>
 
-         <el-form-item label="种类">
-            <el-select style="width: 200px" placeholder="请选择货品的种类" v-model="formModel.kind">
-               <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
-                  :label="goods.name">
-               </el-option>
-            </el-select>
-         </el-form-item>
+               <el-form-item label="种类">
+                  <el-select style="width: 200px" placeholder="请选择货品的种类" v-model="formModel.kind">
+                     <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
+                        :label="goods.name">
+                     </el-option>
+                  </el-select>
+               </el-form-item>
 
-         <el-form-item label="进价" prop="inPriceLow">
-            <el-input v-model="formModel.inPriceLow" style="width: 100px" clearable></el-input>
-         </el-form-item>
-         <span style="margin: 0 -15px;">-</span>
-         <el-form-item prop="inPriceHigh">
-            <el-input v-model="formModel.inPriceHigh" style="width: 100px" clearable></el-input>
-         </el-form-item>
+               <el-form-item label="进价" prop="inPriceLow">
+                  <el-input v-model="formModel.inPriceLow" style="width: 100px" clearable></el-input>
+               </el-form-item>
+               <span style="margin: 0 -15px;">-</span>
+               <el-form-item prop="inPriceHigh">
+                  <el-input v-model="formModel.inPriceHigh" style="width: 100px" clearable></el-input>
+               </el-form-item>
 
-         <div class="button" style="width:100px" @click="Query">查询</div>
-      </el-form>
-      <div class="button-box" style="display: flex;align-items: center;">
+               <div class="button" style="width:100px" @click="Query">查询</div>
+            </el-form>
+            <div class="button-box" style="display: flex;align-items: center;">
 
-         <div class="button" style="margin-top: 20px; margin-bottom: 15px; width:100px " @click="addClick">新增货品
-         </div>
+               <div class="button" style="margin-top: 20px; margin-bottom: 15px; width:100px " @click="addClick">新增货品
+               </div>
 
-         <div class="button" style="margin-top: 20px; margin-bottom: 15px;width:100px" @click="delAllClick">批量删除
-         </div>
-      </div>
+               <div class="button" style="margin-top: 20px; margin-bottom: 15px;width:100px" @click="delAllClick">批量删除
+               </div>
+            </div>
 
       <div class="table-box">
          <el-table border fit v-loading="loading" :data="goodsList" @selection-change="selectionLineChangeHandle"> 
@@ -321,23 +320,74 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
-.el-main {
-   margin-top: 50px;
-   margin-bottom: 60px;
+.scrollbar-demo-item {
    display: flex;
-   flex-direction: column;
-   gap: 20px;
-   padding: 0 30px;
+   align-items: center;
+   justify-content: center;
+   height: 50px;
+   margin: 10px;
+   text-align: center;
+   border-radius: 4px;
+   background: var(--el-color-primary-light-9);
+   color: var(--el-color-primary);
+}
 
-   .el-form {
+.home-section {
+   position: relative;
+   height: 100%;
+   width: 100%;
+
+   .el-main {
+      margin-top: 50px;
+      margin-bottom: 60px;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      margin-right: 5vh;
-      padding: 15px 25px;
-      border-radius: 12px;
-      box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
+      padding: 60px 30px;
+      gap: 20px;
+
+      .el-form {
+         display: flex;
+         justify-content: space-between;
+         margin-right: 5vh;
+         padding: 15px 25px;
+         border-radius: 12px;
+         box-shadow: inset 0 0 10px rgba(49, 61, 68, .8);
+      }
+
+      .table-box {
+         position: relative;
+         box-shadow: -2px -2px 5px rgba(49, 61, 68, .5);
+         border-top: 6px solid;
+         @include border_color('accent-200');
+      }
+
    }
 
+   .el-footer {
+      padding: 0 !important;
+
+      .copyright {
+         height: 80px;
+         width: 100%;
+         @include background_color('bg-300');
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         color: white;
+         box-shadow: 0 -5px 10px rgba(49, 61, 68, .6);
+      }
+
+      .more {
+         padding-top: 60px;
+         @include font_color('text-200');
+         font-size: 25px;
+         font-weight: 500;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+      }
+   }
 }
 
 .button {
@@ -363,31 +413,6 @@ onMounted(() => {
 
    &:active {
       scale: 0.98;
-   }
-}
-
-.el-footer {
-   padding: 0 !important;
-
-   .copyright {
-      height: 80px;
-      width: 100%;
-      @include background_color('bg-300');
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      box-shadow: 0 -5px 10px rgba(49, 61, 68, .6);
-   }
-
-   .more {
-      padding-top: 60px;
-      @include font_color('text-200');
-      font-size: 25px;
-      font-weight: 500;
-      display: flex;
-      justify-content: center;
-      align-items: center;
    }
 }
 </style>

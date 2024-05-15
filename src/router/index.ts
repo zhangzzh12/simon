@@ -5,7 +5,7 @@ const router = createRouter({
     history: createWebHistory(),
     routes: [
         {
-            path: '/',
+            path: '/login',
             component: LoginView,
             children: [
                 {
@@ -15,7 +15,7 @@ const router = createRouter({
             ],
         },
         {
-            path: '/home',
+            path: '/',
             component: () => import("@/pages/HomeView.vue"),
             children: [
                 {
@@ -28,7 +28,7 @@ const router = createRouter({
                 },
                 {
                     path: 'goodsManage',
-                    component: () => import("@/pages/Layout/goodsManage.vue"),
+                    component: () => import("@/pages/Layout/GoodsManage.vue"),
                 },
                 {
                     path:'orderManage',

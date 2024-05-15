@@ -10,6 +10,7 @@ declare module 'vue' {
     Aside: typeof import('./src/components/Aside.vue')['default']
     BarChart: typeof import('./src/components/chart/BarChart.vue')['default']
     ChangeGoods: typeof import('./src/components/changeGoods.vue')['default']
+    ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElConfigProvider: typeof import('element-plus/es')['ElConfigProvider']
     ElContainer: typeof import('element-plus/es')['ElContainer']

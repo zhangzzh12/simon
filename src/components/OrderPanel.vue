@@ -3,11 +3,24 @@ import { ref, reactive } from 'vue';
 import type { FormInstance } from 'element-plus';
 import { useOrderDataStore } from '@/stores/orderData';
 import { saveOrderpostService } from '@/api/order';
-import { ElMessage } from 'element-plus'
 
 const { formInline, dynamicValidateForm } = useOrderDataStore();
 
 const formRef = ref<FormInstance>()//获取表单dom
+function debounce(func, delay) {
+    let timerId;
+
+    return function () {
+        const context = this;
+        const args = arguments;
+
+        clearTimeout(timerId);
+
+        timerId = setTimeout(() => {
+            func.apply(context, args);
+        }, delay);
+    };
+}
 
 interface DomainItem {
     key: number
@@ -38,8 +51,10 @@ const submitForm = async (formEl: FormInstance | undefined) => {
         ElMessage.warning('没有任何货品呢');
         return;
     }
+    console.log(formInline);
     formInline.goodList = [];
     formInline.numberList = [];
+    console.log(formInline);
     for (let i = 0; i < dynamicValidateForm.domains.length; ++i) {
         formInline.goodList[i] = dynamicValidateForm.domains[i].value;
         formInline.numberList[i] = dynamicValidateForm.domains[i].number;
@@ -49,6 +64,9 @@ const submitForm = async (formEl: FormInstance | undefined) => {
     const res = await saveOrderpostService(formInline);
     emits('getvisible', false);
 };
+
+// 使用 debounce 函数创建一个防抖版本的 submit 函数
+const debouncedSubmit = debounce(submitForm, 300); // 设置延迟时间为 300 毫秒
 
 const resetForm = (formEl: FormInstance | undefined) => {
     dynamicValidateForm.domains.forEach(element => {
@@ -82,7 +100,7 @@ const props = defineProps({
             </el-form-item>
             <el-form-item>
                 <div class="button-box">
-                    <div class="button submit" @click="submitForm(formRef)">收银结账</div>
+                    <div class="button submit" @click="debouncedSubmit(formRef)">收银结账</div>
                     <div class="button" @click="addDomain">新增货品项</div>
                     <div class="button" @click="resetForm(formRef)">撤销所有记录</div>
                 </div>

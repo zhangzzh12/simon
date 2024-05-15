@@ -20,7 +20,7 @@ const { formInline } = useWareDataStore();
           </el-form-item>
         <el-form-item class="button-box">
             <slot name="button"></slot>
-        </el-form-item>
+        </el-form-item> 
     </el-form>
 </template>
 

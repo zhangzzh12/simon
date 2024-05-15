@@ -1,15 +1,19 @@
 <script lang="ts" setup>
 import { useMenuStore } from '@/stores/menuData';
+import { tokenStore } from '@/stores/tokenData';
 import { reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 let aside_list = reactive([
-  { id: 1, icon: 'bx-grid-alt', title: '首页', url: '/home' },
-  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/home/warehouseManage' },
-  { id: 3, icon: 'bx-lemon', title: '货品管理', url: '/home/goodsManage' },
-  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/home/orderManage' },
-  { id: 5, icon: 'bx-user', title: '客户管理', url: '/home/customerManage' },
-  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', url: '/home/f' },
-  { id: 7, icon: 'bxs-backpack', title: '供货商管理', url: '/home/f' },
+  { id: 1, icon: 'bx-grid-alt', title: '首页', url: '/' },
+  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/warehouseManage' },
+  { id: 3, icon: 'bx-lemon', title: '货品管理', url: '/goodsManage' },
+  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/orderManage' },
+  { id: 5, icon: 'bx-user', title: '客户管理', url: '/customerManage' },
+  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', url: '/f' },
+  { id: 7, icon: 'bxs-backpack', title: '供货商管理', url: '/f' },
 ]);
 
 let isactive = ref('');
@@ -35,6 +39,14 @@ let li_click = (id: number) => {
     asideList_id[i]='';
   }
   asideList_id[id] = 'active';
+};
+
+//离开
+const token = tokenStore();
+const out = ()=>{
+  token.removeToken();
+  console.log(token.token);
+  router.push('/login');
 };
 
 </script>
@@ -67,10 +79,10 @@ let li_click = (id: number) => {
     </ul>
     <ul class="list-logout">
       <li>
-        <RouterLink to="/">
+        <a @click="out">
           <i class="bx bx-log-out"></i>
           <span class="links-name">Logout</span>
-        </RouterLink>
+        </a>
       </li>
     </ul>
   </div>
@@ -224,7 +236,7 @@ let li_click = (id: number) => {
         transition: opacity .3s ease;
       }
 
-      a {
+      a,.out {
         color: #fff;
         display: flex;
         align-items: center;
