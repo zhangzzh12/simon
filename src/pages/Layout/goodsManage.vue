@@ -272,15 +272,16 @@ onMounted(() => {
                   <el-table-column type="selection" align="center" prop="id"></el-table-column>
                   <el-table-column align="center" label="货品名称" prop="name"></el-table-column>
                   <el-table-column align="center" label="货品编号" prop="code"></el-table-column>
-                  <el-table-column align="center" label="售价" prop="outPrice"></el-table-column>
                   <el-table-column align="center" label="种类" prop="kind"></el-table-column>
                   <el-table-column align="center" label="进价" prop="inPrice"></el-table-column>
+                  <el-table-column align="center" label="售价" prop="outPrice"></el-table-column>
                   <el-table-column align="center" label="图片" prop="image">
                      <template #default="{ row }">
                         <el-avatar :size="80" :src="row.image" />
                      </template>
                   </el-table-column>
-
+                  <el-table-column align="center" label="货品包装规格" prop="packageSpe"></el-table-column>
+                  <el-table-column align="center" label="货品状态" prop="goodsStatus"></el-table-column>
                   <el-table-column align="center" label="操作">
                      <template #default="{ row }">
                         <el-button link type="primary" size="small" style="color: rgb(255, 153, 0)"
