@@ -2,20 +2,17 @@
 import { useMenuStore } from '@/stores/menuData';
 import { onMounted, ref, reactive } from 'vue';
 import OrderPanel from '@/components/OrderPanel.vue';
-import { allOrderGetService, orderGetService } from '@/api/order';
+import { allOrderGetService, checkOrderpostService, orderGetService, returnOrderpostService } from '@/api/order';
+import { useOrderDataStore } from '@/stores/orderData';
+import { ElMessage } from 'element-plus';
 
 
 const { title } = useMenuStore();
-
-onMounted(() => {
-    title.first = '销售单';
-    title.second = '收银';
-    // getorder();
-});
+const { formInline } = useOrderDataStore();
 
 // 查询量
 const search_date = reactive({
-    date: '',
+    date: ['', ''],
     status: '',
 });
 //加载值
@@ -25,23 +22,121 @@ const loading = ref(false);
 const page_index = ref(1);
 const total_page_number = ref(0);
 
-//条件查询销售单
+//订单info
 
-const getorder = async ()=>{
-    const res = await allOrderGetService();
-    console.log(res.data);
-};
-
-
+const order_info = ref([
+    { label: '编号', value: '-----' },
+    { label: '交易时间', value: '-----' },
+    { label: '总价', value: '---￥' },
+    { label: '状态', value: '---' },
+]);
 
 // 表格数据
-const tableData = ref([]);
+interface order {
+    id: number
+    nameList: string[]
+    numberList: number[]
+    priceList: number[]
+    goodList: string[]
+    totalPrice: number
+    status: number
+    time: string
+}
+
+interface orderItem {
+    name: string
+    number: number
+    price: number
+    goodsCode: string
+}
+
+const orderList = ref<order[]>([]);
+const tableData = ref<orderItem[]>([]);
 const tableTitle = [
     { props: 'name', label: '货品名称' },
-    { props: 'gender', label: '货品数量' },
-    { props: 'job', label: '货品单价' },
-    { props: 'date', label: '交易记录时间' },
+    { props: 'goodsCode', label: '货品编号' },
+    { props: 'number', label: '货品数量' },
+    { props: 'price', label: '货品单价' },
 ];
+
+const clean = () => {
+    tableData.value = [];
+    page_index.value = 1;
+    total_page_number.value = 0;
+    order_info.value = [
+        { label: '编号', value: '-----' },
+        { label: '交易时间', value: '-----' },
+        { label: '总价', value: '---￥' },
+        { label: '状态', value: '---' },
+    ];
+};
+
+//条件查询销售单
+
+const order_status = ['未审核', '已审核', '已退货'];
+
+const getOrderItem = () => {
+    let order_item = orderList.value[page_index.value - 1];
+    for (let i = 0; i < order_item.nameList.length; ++i) {
+        tableData.value[i] = { name: '', number: 1, price: 1, goodsCode: '' };
+        tableData.value[i].name = order_item.nameList[i];
+        tableData.value[i].number = order_item.numberList[i];
+        tableData.value[i].goodsCode = order_item.goodList[i];
+        tableData.value[i].price = order_item.priceList[i];
+    }
+    order_info.value[0].value = 'Or' + order_item.id.toString();
+    order_info.value[1].value = order_item.time.replace('T', ' | ');
+    order_info.value[2].value = order_item.totalPrice.toString() + '￥';
+    order_info.value[3].value = order_status[order_item.status];
+}
+
+const getorder = async () => {
+    loading.value = true;
+    const res = await allOrderGetService();
+    const resData = res.data.data;
+    total_page_number.value = resData.length;
+    for (let i = 0; i < resData.length; ++i) {
+        orderList.value[i] = resData[i];
+    }
+    orderList.value.reverse();
+    getOrderItem();
+    loading.value = false;
+};//获取所有数据
+
+onMounted(() => {
+    title.first = '销售单';
+    title.second = '收银';
+    getorder();
+});
+
+const search = async () => {
+    clean();
+    loading.value = true;
+    search_date.date = !search_date.date ? ['', ''] : search_date.date;
+    if (search_date.status == '') {
+        const res = await orderGetService(search_date.date[0], search_date.date[1]);
+        const resData = res.data.data;
+        if (resData.length > 0) {
+            total_page_number.value = resData.length;
+            for (let i = 0; i < resData.length; ++i) {
+                orderList.value[i] = resData[i];
+            }
+            getOrderItem();
+        }
+        loading.value = false;
+        return;
+    }
+    const res = await orderGetService(search_date.date[0], search_date.date[1], parseInt(search_date.status));
+    const resData = res.data.data;
+    if (resData.length > 0) {
+        total_page_number.value = resData.length;
+        for (let i = 0; i < resData.length; ++i) {
+            orderList.value[i] = resData[i];
+        }
+        getOrderItem();
+    }
+    loading.value = false;
+}
 
 //新增销售单
 const dialogVisible = ref(false);
@@ -49,15 +144,60 @@ const addorder = () => {
     dialogVisible.value = true;
 };
 
-//订单info
+const emitsGetvisible = (data: boolean) => {
+    dialogVisible.value = data;
+    getorder();
+}
 
-const order_info = ref([
-    { label: '编号', value: '#123435' },
-    { label: '时间', value: '2024-01-09' },
-    { label: '总价', value: '500￥' },
-    { label: '状态', value: '已审核' },
-]);
+//分页按钮
 
+const prev = () => {
+    if (page_index.value > 1) {
+        page_index.value--;
+        getorder();
+    } else {
+        ElMessage.warning('已到达最新订单！');
+    }
+};
+
+const next = () => {
+    if (page_index.value < total_page_number.value) {
+        page_index.value++;
+        getorder();
+    } else {
+        ElMessage.warning('已到达最早订单！');
+    }
+};
+
+const jumpTo = () => {
+    if (page_index.value > total_page_number.value) {
+        page_index.value = total_page_number.value;
+        ElMessage.warning('操作溢出，已修正');
+    }
+    if (page_index.value < 1) {
+        page_index.value = 1;
+        ElMessage.warning('操作溢出，已修正');
+    }
+    getorder();
+};
+
+//退货
+const returnVisible = ref(false);
+const refund = async () => {
+    console.log(orderList.value[page_index.value - 1]);
+    const res = await returnOrderpostService(orderList.value[page_index.value - 1]);
+    returnVisible.value = false;
+    getorder();
+}
+
+//审核
+const checkVisible = ref(false);
+const check = async () => {
+    console.log(orderList.value[page_index.value - 1]);
+    const res = await checkOrderpostService(orderList.value[page_index.value - 1]);
+    checkVisible.value = false;
+    getorder();
+}
 </script>
 
 <template>
@@ -80,12 +220,13 @@ const order_info = ref([
                                 <el-option label="未审核" value=0 />
                                 <el-option label="已审核" value=1 />
                                 <el-option label="已退货" value=2 />
+                                <el-option label="全部" value='' />
                             </el-select>
                         </div>
-                        <div class="button">查询</div>
+                        <div class="button" @click="search">查询</div>
                     </form>
                     <section class="button-box">
-                        <div class="button" @click="addorder">进行结账(新增销售单)</div>
+                        <div class="button cash" @click="addorder">进行结账(新增销售单)</div>
                     </section>
                     <section class="order-box">
                         <div class="info-box">
@@ -102,12 +243,39 @@ const order_info = ref([
                         </el-table>
                     </section>
                     <section class="button-box page">
-                        <div class="button">上一页</div>
-                        <div class="button">退货</div>
-                        <div class="button">下一页</div>
+                        <div class="button" @click="prev">上一页</div>
+                        <div class="button refund" @click="returnVisible = true">退货</div>
+                        <div class="button refund" @click="checkVisible = true">审核</div>
+                        <div class="button" @click="next">下一页</div>
+                        <span>当前页面：</span><input class="page-index" type="number" @blur="jumpTo" v-model="page_index" />
+                        <div class="total-data">共有{{ total_page_number }}单</div>
                     </section>
                     <el-dialog v-model="dialogVisible" width="600" draggable>
-                        <OrderPanel title="销售单结账进行中" />
+                        <OrderPanel title="销售单结账进行中" @getvisible="emitsGetvisible" />
+                    </el-dialog>
+                    <el-dialog v-model="returnVisible" width="350">
+                        <div class="title">
+                            <h3>退回订单</h3>
+                        </div>
+                        <div class="warning-box">
+                            <div class="content">您确定要进行退货操作吗</div>
+                            <div class="button-box">
+                                <div class="button" @click="refund">确认</div>
+                                <div class="button" @click="returnVisible = false">取消</div>
+                            </div>
+                        </div>
+                    </el-dialog>
+                    <el-dialog v-model="checkVisible" width="350">
+                        <div class="title">
+                            <h3>审核订单</h3>
+                        </div>
+                        <div class="warning-box">
+                            <div class="content">订单是否核对正确</div>
+                            <div class="button-box">
+                                <div class="button" @click="check">确认审核</div>
+                                <div class="button" @click="checkVisible = false">取消</div>
+                            </div>
+                        </div>
                     </el-dialog>
                 </el-main>
                 <el-footer>
@@ -155,6 +323,7 @@ const order_info = ref([
         gap: 20px;
 
         .button {
+            user-select: none;
             min-width: 100px;
             padding: 0 10px;
             height: 35px;
@@ -169,6 +338,11 @@ const order_info = ref([
             box-shadow: 0 0 4px rgba(49, 61, 68, .5);
             text-align: center;
             line-height: 35px;
+
+            &.refund,
+            &.cash {
+                @include background_color('primary-300');
+            }
 
             &:hover {
                 scale: 1.03;
@@ -211,12 +385,45 @@ const order_info = ref([
 
         .button-box {
             display: flex;
+            justify-content: center;
             position: relative;
 
             &.page {
                 justify-content: space-between;
                 align-items: center;
                 padding: 0 20%;
+
+                span {
+                    @include font_color('tetx-100');
+                    font-weight: 600;
+                    white-space: nowrap;
+                }
+
+                .total-data {
+                    box-shadow: 0 0 10px rgba(49, 61, 68, .8);
+                    padding: 8px 10px;
+                    border-radius: 12px;
+                    @include background_color('primary-200');
+                    white-space: nowrap;
+                    color: white;
+                }
+
+                .page-index {
+                    width: 60px;
+                    padding: 0 10px;
+                    height: 35px;
+                    outline: none;
+                    border: none;
+                    @include background_color('accent-200');
+                    color: white;
+                    font-size: 16px;
+                    border-radius: 5px;
+                    transition: all .3s ease;
+                    margin-right: 80px;
+                    box-shadow: 0 0 4px rgba(49, 61, 68, .5);
+                    text-align: center;
+                    line-height: 35px;
+                }
             }
         }
 
@@ -237,6 +444,7 @@ const order_info = ref([
                 .info {
                     display: flex;
                     align-items: center;
+                    @include font_color('text-100');
 
                     span {
                         user-select: none;
@@ -304,6 +512,31 @@ const order_info = ref([
                     }
                 }
             }
+        }
+
+        .title {
+            padding: 8px 10px;
+            border-left: 4px solid;
+            @include border_color('accent-200');
+        }
+
+        .warning-box {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+
+            .content {
+                font-size: 20px;
+                @include font_color('primary-200');
+            }
+
+            .button-box {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
         }
 
     }

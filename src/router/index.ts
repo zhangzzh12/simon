@@ -25,8 +25,6 @@ const router = createRouter({
                 {
                     path:'warehouseManage',
                     component:()=>import("@/pages/Layout/WarehouseManage.vue"),
-                    path: 'warehouse',
-                    component: () => import("@/pages/Layout/warehouse.vue"),
                 },
                 {
                     path: 'goodsManage',

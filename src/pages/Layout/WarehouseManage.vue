@@ -222,6 +222,7 @@ const dialogVisible = ref(false);
         padding: 60px 0;
 
         .button {
+            user-select: none;
             min-width: 100px;
             padding: 0 10px;
             height: 35px;

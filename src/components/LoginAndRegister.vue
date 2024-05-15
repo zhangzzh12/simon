@@ -1,12 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
-import axios from 'axios';
 import { tokenStore } from '@/stores/tokenData.ts';
 import request from '@/utils/request.ts';
-const http = axios.create({
-    baseURL: 'https://eel-rapid-grizzly.ngrok-free.app',
-    timeout: 5000
-});
 
 const user = reactive({
     username: '',
@@ -27,9 +22,8 @@ const sublim = async () => {
         const res = await request.post('/login', user);
         const tokenstore = tokenStore();
         tokenstore.token = res.data.data;
-        console.log(tokenstore.token);
     } else {
-        alert('验证码错误！\n你输入的是:  ' + value + "\n正确的是:  " + num + '\n请重新输入！');
+        alert('验证码错误');
         dj();
     }
 };

@@ -30,13 +30,12 @@ const addDomain = () => {
     })
 };
 
+const emits = defineEmits(['getvisible']);
+
 const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     if (dynamicValidateForm.domains.length < 1) {
-        ElMessage({
-            message: '没有任何货品欸',
-            type: 'warning',
-        })
+        ElMessage.warning('没有任何货品呢');
         return;
     }
     formInline.goodList = [];
@@ -48,7 +47,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
 
 
     const res = await saveOrderpostService(formInline);
-    console.log(res);
+    emits('getvisible', false);
 };
 
 const resetForm = (formEl: FormInstance | undefined) => {
@@ -123,6 +122,7 @@ const props = defineProps({
     }
 
     .button-box {
+        user-select: none;
         display: flex;
         justify-content: space-between;
         align-items: center;

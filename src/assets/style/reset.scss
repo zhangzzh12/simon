@@ -1,3 +1,15 @@
-body{
+body {
     margin: 0;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}//取消数字输入框上下箭头
+
+/* 兼容性样式 */
+input[type="number"] {
+    -moz-appearance: textfield;
+    /* Firefox */
 }

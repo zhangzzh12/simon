@@ -35,7 +35,6 @@ let li_click = (id: number) => {
     asideList_id[i]='';
   }
   asideList_id[id] = 'active';
-  console.log(asideList_id);
 };
 
 </script>

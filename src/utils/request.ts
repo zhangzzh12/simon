@@ -12,8 +12,8 @@ instance.interceptors.request.use(
         const tokenstore = tokenStore();
         
         if (tokenstore.token) {
-            config.headers.Authorization = tokenstore.token
-            config.headers["ngrok-skip-browser-warning"] = 0
+            config.headers.Authorization = tokenstore.token;
+            config.headers["ngrok-skip-browser-warning"] = 0;
         }
         return config
     },
@@ -25,12 +25,11 @@ instance.interceptors.request.use(
 //响应拦截器
 instance.interceptors.response.use(
     (res) => {
-        console.log(res)
         if (res.data.code === 1) {
             return res
         }
-        ElMessage.error(res.data.msg)
-        return Promise.reject(res.data)
+        ElMessage.error(res.data.msg);
+        return Promise.reject(res.data);
     },
     (err) => {
         return Promise.reject(err)

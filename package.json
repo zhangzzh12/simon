@@ -18,11 +18,13 @@
     "path": "^0.12.7",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
+    "qs": "^6.12.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
   "devDependencies": {
     "@types/node": "^20.12.3",
+    "@types/qs": "^6.9.15",
     "@vitejs/plugin-vue": "^5.0.4",
     "node-sass": "^9.0.0",
     "sass": "^1.72.0",
