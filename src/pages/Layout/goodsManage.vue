@@ -305,8 +305,8 @@ onMounted(() => {
             :total="total" @size-change="onSizeChange" @current-change="onCurrentChange"
             style="margin-top: 20px; justify-content: end" />
       </div>
-   </el-main>
-   <el-footer>
+         </el-main>
+         <el-footer>
       <div class="copyright">Copyright © , All Rights Reserved.</div>
       <div class="more">
          <span>Simon</span>
@@ -315,8 +315,9 @@ onMounted(() => {
          <el-divider direction="vertical" />
          <span>Watermark</span>
       </div>
-   </el-footer>
-
+         </el-footer>
+      </el-scrollbar>
+   </div>
 </template>
 
 <style scoped lang="scss">
