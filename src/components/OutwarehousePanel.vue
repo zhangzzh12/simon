@@ -15,7 +15,6 @@ const countValidator = (rule,value,callback) => {
 }
 const rules = {
     number:[
-        {min:0,message:'出库数量不能为负数',trigger:'blur'},
         {validator: countValidator,trigger:'blur'}
     ]
 }

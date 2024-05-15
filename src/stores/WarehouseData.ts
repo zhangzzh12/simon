@@ -11,6 +11,7 @@ export const useWareDataStore = defineStore('waredata', () => {
     location: 0,
     code: '',
     inPrice: '',
+    time:''
   });
   const houseNumber = ref(0) 
   return {
