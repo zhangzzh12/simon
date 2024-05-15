@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import { tokenStore } from '@/stores/tokenData.ts';
-import request from '@/utils/request.ts';
+import { postLogin } from '@/api/login';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const user = reactive({
     username: '',
     password: ''
@@ -10,27 +12,29 @@ const user = reactive({
 
 let isactive = ref(false);
 const registerLink = () => {
-    isactive.value = !isactive.value;
+    isactive.value = !isactive.value; 
 };
 //验证码
 let show_num: number[] = [];
 let value = '';
+const token = tokenStore();
 const sublim = async () => {
     let num = show_num.join("");
     if (!value) return alert('请输入验证码！');
     if (value === num) {
-        const res = await request.post('/login', user);
-        const tokenstore = tokenStore();
-        tokenstore.token = res.data.data;
+        const res = await postLogin(user);
+        if (res.data.code == 1) {
+            token.token = res.data.data;         
+            router.push('/');
+        }else{
+            alert(res.data.msg);
+        }
     } else {
         alert('验证码错误');
         dj();
     }
 };
 
-const test = async ()=>{
-    await request.get('/warehouse',{params:{page:1,pageSize:10}});
-};
 function charList(length = 26, code = 'a') {
     // fromCharCode: 将Unicode编码转为一个字符:
     // charCodeAt: 获得自负unicode编码;
@@ -237,7 +241,7 @@ const closeVerify = (index: number) => {
                 <div class="remember-forgot">
                     <label><input type="checkbox">记住密码</label>
                 </div>
-                <div type="submit" class="btn" @click="sublim()">登录</div>
+                <div class="btn" @click="sublim">登录</div>
                 <div class="login-register">
                     <span>还没有一个账户？<a href="#" @click="registerLink">去注册</a></span>
                 </div>
