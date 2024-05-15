@@ -174,17 +174,17 @@ const onSubmit = async () => {
         </el-upload>
       </el-form-item>
 
-      <el-form-item label="货品种类">
-        <el-select placeholder="请选择货品的种类" v-model="formInline.kind">
-          <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
-            :label="goods.name">
-          </el-option>
-        </el-select>
-      </el-form-item>
+        <el-form-item label="货品种类"  v-if="formInline.id === ''">
+          <el-select placeholder="请选择货品的种类" v-model="formInline.kind">
+            <el-option v-for="goods in goodsKind" style="margin-left: 10px;" :value="goods.id" :key="goods.id"
+              :label="goods.name">
+            </el-option>
+            </el-select>
+        </el-form-item>
 
-      <el-form-item label="货品编号" prop="code">
-        <el-input v-model="formInline.code" placeholder="请输入货品编号" clearable />
-      </el-form-item>
+        <el-form-item v-if="formInline.id === ''" label="货品编号" prop="code">
+            <el-input v-model="formInline.code" placeholder="请输入货品编号" clearable />
+        </el-form-item>
 
       <el-form-item label="货品包装规格">
         <el-input v-model="formInline.packageSpe" placeholder="请输入货品包装规格" clearable />

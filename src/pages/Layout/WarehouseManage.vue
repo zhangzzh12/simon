@@ -2,14 +2,30 @@
 import { ref, reactive, onMounted } from 'vue';
 import BarChart from '@/components/chart/BarChart.vue';
 import { useMenuStore } from '@/stores/menuData';
-import { warehouseGetService, warehouseCountGetService, warehousePostService, inwarehousePostService, outwarehousePostService } from '@/api/warehouse';
+import { warehouseGetService, warehouseCountGetService, warehousePostService, inwarehousePostService, outwarehousePostService, billGetService } from '@/api/warehouse';
 import WarehousePanel from '@/components/WarehousePanel.vue';
 import OutwarehousePanel from '@/components/OutwarehousePanel.vue';
 import InwarehousePanel from '@/components/InwarehousePanel.vue';
 import { useWareDataStore } from '@/stores/WarehouseData';
+import { formatTime } from '@/utils/format.ts'
 const { formInline } = useWareDataStore(); 
 const useWareData = useWareDataStore();
 // 种类列表
+const goodsName = ref([
+    '日用品类',
+    '食品类',
+    '服装鞋帽类',
+    '饮料类',
+    '烟草类',
+    '药品类',
+    '电子产品类',
+    '家用电器类',
+    '家居用品类',
+    '书籍文具类',
+     '化妆品类',
+     '运动户外用品类',
+     '汽车配件类','宠物用品类',
+])
 const goodsKind = ref([
    {
       id:'',
@@ -74,67 +90,74 @@ const goodsKind = ref([
 ])
 // 仓库货品数量列表
 const goodsCountList = ref([])
-const mergedData = ref()
+const mergedData = ref([
+    {name:'日用品类',value:'20'},
+])
 const num = ref(0)
 // 查询量
-const search_date = reactive({
-    page:'',
-    pageSize:'',
+const search_date = ref({
+    page:1,
+    pageSize:10,
     warehouseNum:0,
     name: '',
     kind:''
 });
+const search_bill = ref({
+    page:1,
+    pageSize:10,
+    warehouseNum:0,
+    day:''
+});
 //加载值
 const loading = ref(false);
-
+const load = ref(false)
 //每页数据展示量
-const page_index = ref(1);
-const page_data_value = ref(10);
 const total_page_number = ref(0);
-const page_data_number = [
-    {
-        value: 10,
-        label: 10,
-    },
-    {
-        value: 20,
-        label: 20,
-    },
-    {
-        value: 50,
-        label: 50,
-    },
-    {
-        value: 100,
-        label: 100,
-    },
-];
+const total_bill = ref(0)
 
 // 表格数据
 const tableData = ref();
+const billList = ref();
 const tableTitle = [
     { props: 'name', label: '货品名称' },
     { props: 'code', label: '编码' },
     { props: 'number', label: '数量' },
 ];
 
+//获取所有的台账
+const billGet = async () => {
+    load.value = true
+    const res = await billGetService(search_bill.value)
+    total_bill.value = res.data.data.total
+    billList.value = res.data.data.rows
+    billList.value.forEach(element => {
+        if(element.number<0){
+            element.number = '出库' + (-element.number);
+        }else{
+            element.number = '入库' + (element.number);
+        }
+        element.time = formatTime(element.time)
+    }); 
+    load.value = false
+}
 //获取货品信息
 const goodsGet = async () => {
     loading.value = true
-    const res = await warehouseGetService(search_date)
+    const res = await warehouseGetService(search_date.value)
     total_page_number.value = res.data.data.total
     tableData.value = res.data.data.rows
     loading.value = false
 }
 //获取仓库信息
 const countList = async () => {
-    const res = await warehouseCountGetService(search_date.warehouseNum)
+    const res = await warehouseCountGetService(search_date.value.warehouseNum)
     goodsCountList.value = res.data.data
+    console.log(goodsCountList.value)
     mergedData.value = goodsKind.value.slice(1).map((item, index) => ({
         name: item.name,
         value: goodsCountList.value[index]
     }));
-    console.log(mergedData.value)
+     console.log(mergedData.value)
 }
 //查询货品 
 const Query = () => {
@@ -159,17 +182,19 @@ const addGoods = () => {
 }
 const inWarehouse = async (row) => {
     formInline.id = row.id
-    formInline.name = ''
+    formInline.name = row.name
     formInline.inPrice = ''
     formInline.kind = ''
     formInline.location = 0
     formInline.code = row.code
     formInline.number = ''
     inWarehouseVisible.value = true
+    search_bill.value.page = 1
+    await billGet()
 }
 const outWarehouse = async (row) => {
     formInline.id = row.id
-    formInline.name = ''
+    formInline.name = row.name
     formInline.inPrice = ''
     formInline.kind = ''
     formInline.location = 0
@@ -178,9 +203,9 @@ const outWarehouse = async (row) => {
     num.value = row.number
     useWareData.houseNumber = row.number
     outWarehouseVisible.value = true
+    await billGet()
 }
 const inWarehouseOperation = async () => {
-    console.log(formInline)
     if(Number(formInline.number)<0){
         alert("入库数量不能为负数");
     }else {
@@ -188,7 +213,6 @@ const inWarehouseOperation = async () => {
         goodsGet()
         inWarehouseVisible.value = false
     }
-
 }
 const outWarehouseOperation = async () => {
     if(Number(formInline.number)>num.value){
@@ -201,7 +225,26 @@ const outWarehouseOperation = async () => {
         outWarehouseVisible.value = false   
     }
 }
-
+//改变每页展示的数量
+const onSizeChange = (size:number) => {
+    search_date.value.page = 1
+    search_date.value.pageSize = size
+    goodsGet()
+}
+const SizeChange = (size:number) => {
+    search_bill.value.page = 1
+    search_bill.value.pageSize = size
+    billGet()
+}
+//改变页数
+const onCurrentChange = (page: number) => {
+   search_date.value.page = page
+   goodsGet()
+} 
+const CurrentChange = (page: number) => {
+   search_bill.value.page = page
+   billGet()
+} 
 //面包屑
 const { title } = useMenuStore();
 onMounted(() => {
@@ -209,6 +252,7 @@ onMounted(() => {
     title.second = '店铺';
     goodsGet()
     countList()
+    billGet()
 });
 
 //新增货品项
@@ -227,7 +271,8 @@ const outWarehouseVisible = ref(false);
                     <section class="statistic-box">
                         <div class="bar-box">
                             <BarChart chartTitle="仓位速览"
-                                :chartData="goodsCountList" />
+                                :xAxis="goodsName"
+                                :chartData="mergedData" />
                         </div>
                     </section>
                     <section class="data-box">
@@ -259,29 +304,18 @@ const outWarehouseVisible = ref(false);
                                         <template #default=" {row} ">
                                             <el-button type="primary" size="small" @click.prevent="inWarehouse(row)">入库</el-button>
                                             <el-button link type="primary" size="small" @click.prevent="outWarehouse(row)">出库</el-button>
+                                            <el-button link type="primary" size="small" @click.prevent="">调拨货品</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
                                 <div class="page-box">
-                                    <div class="data-select">
-                                        <span>每页至多展示数据数</span>
-                                        <el-select v-model="page_data_value" placeholder="请选择" style="width: 100px;"
-                                            @change="">
-                                            <el-option v-for="item in page_data_number" :key="item.value"
-                                                :label="item.label" :value="item.value" />
-                                        </el-select>
-                                    </div>
-                                    <div class="wrapper">
-                                        <div class="total-data">
-                                            共<span>{{ total_page_number }}</span>条数据
-                                        </div>
-                                        <el-pagination background layout="prev, pager, next" :total="total_page_number"
-                                            :page-size="page_data_value" @current-change="" hide-on-single-page="true"
-                                            v-model:current-page="page_index" />
-                                    </div>
+                                    <el-pagination v-model:current-page="search_date.page" v-model:page-size="search_date.pageSize"
+                                    :page-sizes="[10,20,50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                                    :total="total_page_number" @size-change="onSizeChange" @current-change="onCurrentChange"
+                                    style="margin-top: 5px; justify-content: end" />
                                 </div>
                             </section>
-                            <el-dialog v-model="inWarehouseVisible" width="380">
+                            <el-dialog v-model="inWarehouseVisible" width="300">
                                 <InwarehousePanel title="入库" >
                                     <template v-slot:button>
                                         <div class="button-box">
@@ -291,7 +325,7 @@ const outWarehouseVisible = ref(false);
                                     </template>
                                 </InwarehousePanel>
                             </el-dialog>
-                            <el-dialog v-model="outWarehouseVisible" width="380">
+                            <el-dialog v-model="outWarehouseVisible" width="300">
                                 <OutwarehousePanel title="出库">
                                     <template v-slot:button>
                                         <div class="button-box">
@@ -314,41 +348,29 @@ const outWarehouseVisible = ref(false);
                         </div>
                         <div class="ledger-box">
                             <form class="input-form">
-                                <el-form-item label="入职时间">
-                                    <el-date-picker type="date" placeholder="请选择入职时间"
+                                <el-form-item label="台账生成时间">
+                                    <el-date-picker type="date" placeholder="请选择台账生成时间" v-mdoel="search_bill.day"
                                         value-format="YYYY-MM-DD" clearable style="width: 200px;" />
                                 </el-form-item>
                                 <div class="button" @click="">查询</div>
                             </form>
                             <section class="table-box ledger">
-                                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto"
-                                    v-loading="loading">
-                                    <el-table-column prop="date" label="日期" align="center" />
-                                    <el-table-column prop="date" label="货品名称" align="center" />
-                                    <el-table-column prop="date" label="变动" align="center" />
-                                    <el-table-column label="操作" align="center" width="200px">
+                                <el-table ref="multipleTableRef" :data="billList" table-layout="auto"
+                                    v-loading="load">
+                                    <el-table-column prop="time" label="日期" align="center" width="150"/>
+                                    <el-table-column prop="name" label="货品名称" align="center" width="150"/>
+                                    <el-table-column prop="number" label="变动" align="center" width="80"/>
+                                    <el-table-column label="操作" align="center" >
                                         <template #default="scope">
                                             <el-button type="primary" size="small" @click.prevent="">撤销</el-button>
                                         </template>
                                     </el-table-column>
                                 </el-table>
                                 <div class="page-box">
-                                    <div class="data-select">
-                                        <span>每页至多展示数据数</span>
-                                        <el-select v-model="page_data_value" placeholder="请选择" style="width: 80px;"
-                                            @change="">
-                                            <el-option v-for="item in page_data_number" :key="item.value"
-                                                :label="item.label" :value="item.value" />
-                                        </el-select>
-                                    </div>
-                                    <div class="wrapper">
-                                        <div class="total-data">
-                                            共<span>{{ total_page_number }}</span>条数据
-                                        </div>
-                                        <el-pagination background layout="prev, pager, next" :total="total_page_number"
-                                            :page-size="page_data_value" @current-change="" hide-on-single-page="true"
-                                            v-model:current-page="page_index" />
-                                    </div>
+                                    <el-pagination v-model:current-page="search_bill.page" v-model:page-size="search_bill.pageSize"
+                                    :page-sizes="[10,20,50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                                    :total="total_bill" @size-change="SizeChange" @current-change="CurrentChange"
+                                    style="margin-top: 5px; justify-content: end" />
                                 </div>
                             </section>
                         </div>

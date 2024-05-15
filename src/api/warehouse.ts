@@ -14,3 +14,8 @@ export const inwarehousePostService = (data) => {
 export const outwarehousePostService = (data) => {
   return request.post('/outWarehouse',data)
 }
+export const billGetService = (params) => {
+  return request.get('/getAllLedger',{
+    params
+  })
+}
