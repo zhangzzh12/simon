@@ -206,7 +206,7 @@ const check = async () => {
 <template>
     <div class="common-layout home-section">
         <el-scrollbar>
-            <el-container style="display: flex;justify-content: space-between;">
+            <el-container>
                 <el-main>
                     <form class="input-form">
                         <div class="input-box flex">

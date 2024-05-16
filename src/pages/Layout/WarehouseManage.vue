@@ -284,7 +284,7 @@ const outWarehouseVisible = ref(false);
 <template>
     <div class="common-layout home-section">
         <el-scrollbar>
-            <el-container style="display: flex;justify-content: space-between;">
+            <el-container>
                 <el-main>
                     <section class="statistic-box">
                         <div class="bar-box">
