@@ -64,7 +64,6 @@ const initChart = () => {
     });
 };
 watch(props.chartData, (newValue,oldValue) => {
-    console.log(newValue)
     if(newValue.length>0){
         initChart();
     }

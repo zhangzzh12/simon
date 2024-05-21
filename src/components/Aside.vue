@@ -1,77 +1,81 @@
 <script lang="ts" setup>
-import { useMenuStore } from '@/stores/menuData';
-import { tokenStore } from '@/stores/tokenData';
-import { reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { useMenuStore } from "@/stores/menuData";
+import { tokenStore } from "@/stores/tokenData";
+import { reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 let aside_list = reactive([
-  { id: 1, icon: 'bx-grid-alt', title: '首页', url: '/' },
-  { id: 2, icon: 'bx-cog', title: '仓库管理', url: '/warehouseManage' },
-  { id: 3, icon: 'bx-lemon', title: '货品管理', url: '/goodsManage' },
-  { id: 4, icon: 'bx-cart-alt', title: '订单管理', url: '/orderManage' },
-  { id: 5, icon: 'bx-user', title: '客户管理', url: '/customerManage' },
-  { id: 6, icon: 'bx-credit-card', title: '商务人员管理', url: '/f' },
-  { id: 7, icon: 'bxs-backpack', title: '供货商管理', url: '/f' },
+  { id: 1, icon: "bx-grid-alt", title: "首页", url: "/" },
+  { id: 2, icon: "bx-cog", title: "仓库管理", url: "/warehouseManage" },
+  { id: 3, icon: "bx-lemon", title: "货品管理", url: "/goodsManage" },
+  { id: 4, icon: "bx-cart-alt", title: "订单管理", url: "/orderManage" },
+  { id: 5, icon: "bx-user", title: "客户管理", url: "/customerManage" },
+  { id: 6, icon: "bx-credit-card", title: "商务人员管理", url: "/f" },
+  { id: 7, icon: "bxs-backpack", title: "供货商管理", url: "/f" },
 ]);
 
-let isactive = ref('');
+let isactive = ref("");
 let menu_btn = () => {
   if (!isactive.value) {
-    isactive.value = 'active';
-  }
-  else {
-    isactive.value = '';
+    isactive.value = "active";
+  } else {
+    isactive.value = "";
   }
 };
 
 let Search_btn = () => {
-  if (!isactive.value) { isactive.value = 'active'; }
-  else { isactive.value = ''; }
+  if (!isactive.value) {
+    isactive.value = "active";
+  } else {
+    isactive.value = "";
+  }
 };
 
-
-const { title , asideList_id } = useMenuStore();
+const { title, asideList_id } = useMenuStore();
 
 let li_click = (id: number) => {
-  for(let i=0;i<asideList_id.length;++i){
-    asideList_id[i]='';
+  for (let i = 0; i < asideList_id.length; ++i) {
+    asideList_id[i] = "";
   }
-  asideList_id[id] = 'active';
+  asideList_id[id] = "active";
 };
 
 //离开
 const token = tokenStore();
-const out = ()=>{
+const out = () => {
   token.removeToken();
   console.log(token.token);
-  router.push('/login');
+  router.push("/login");
 };
-
 </script>
 
 <template>
   <div class="sidebar" :class="isactive">
     <div class="logo-content">
       <div class="logo">
-        <i class='bx bxl-flutter'></i>
+        <i class="bx bxl-flutter"></i>
         <h3>西蒙零售<br />批发管理平台</h3>
       </div>
-      <i class='bx bx-menu' id="btn" @click="menu_btn"></i>
+      <i class="bx bx-menu" id="btn" @click="menu_btn"></i>
     </div>
-
 
     <ul class="list">
       <li>
         <a href="#">
           <i class="bx bx-search" @click="Search_btn"></i>
-          <input type="text" placeholder="Search">
+          <input type="text" placeholder="Search" />
         </a>
       </li>
-      <li v-for="value in aside_list" :key="value.id" :class="asideList_id[value.id]" @click="li_click(value.id)">
+      <li
+        v-for="value in aside_list"
+        :key="value.id"
+        :class="asideList_id[value.id]"
+        @click="li_click(value.id)"
+      >
         <RouterLink :to="value.url">
-          <i class='bx' :class="value.icon"></i>
+          <i class="bx" :class="value.icon"></i>
           <span class="links-name">{{ value.title }}</span>
         </RouterLink>
         <span class="tooltip">{{ value.title }}</span>
@@ -92,17 +96,17 @@ const out = ()=>{
 .sidebar {
   width: 80px;
   height: 100%;
-  @include background_color('bg-300');
+  @include background_color("bg-300");
   backdrop-filter: blur(5px);
   box-shadow: inset -5px 0 10px rgba(0, 0, 0, 0.6);
   padding: 6px 14px;
-  transition: all .5s ease;
+  transition: all 0.5s ease;
 
   &.active {
     width: 240px;
 
     .logo {
-      transition-delay: .2s;
+      transition-delay: 0.2s;
       /* ------- */
       opacity: 1;
     }
@@ -136,7 +140,7 @@ const out = ()=>{
     /* ------- */
     font-size: 28px;
     opacity: 0;
-    transition: opacity .5s ease;
+    transition: opacity 0.5s ease;
 
     h3 {
       font-size: 20px;
@@ -166,7 +170,7 @@ const out = ()=>{
       width: 100%;
       margin: 5px 0;
       line-height: 50px;
-      transition: background-color .1s ease;
+      transition: background-color 0.1s ease;
       animation: animateBg 5s linear infinite;
 
       &.active {
@@ -194,7 +198,7 @@ const out = ()=>{
         .tooltip {
           opacity: 1;
           top: 50%;
-          transition: .5s ease;
+          transition: 0.5s ease;
         }
       }
 
@@ -233,14 +237,15 @@ const out = ()=>{
 
       .links-name {
         opacity: 0;
-        transition: opacity .3s ease;
+        transition: opacity 0.3s ease;
       }
 
-      a,.out {
+      a,
+      .out {
         color: #fff;
         display: flex;
         align-items: center;
-        transition: all .2s;
+        transition: all 0.2s;
         white-space: nowrap;
 
         /* ---------------- */
