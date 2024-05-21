@@ -64,7 +64,6 @@ const initChart = () => {
     });
 };
 watch(props.chartData, (newValue,oldValue) => {
-    console.log(newValue)
     if(newValue.length>0){
         initChart();
     }
@@ -75,7 +74,7 @@ onMounted(()=>{
 </script>
 
 <template>
-    <div ref="chart" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;margin: 10px;"></div>
+    <div ref="chart" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;margin: 5px;"></div>
 </template>
 
 <style lang="scss" scoped></style>
