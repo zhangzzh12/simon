@@ -338,6 +338,128 @@ const check = async () => {
       </el-container>
     </el-scrollbar>
   </div>
+  <div class="common-layout home-section">
+    <el-scrollbar>
+      <el-container>
+        <el-main>
+          <form class="input-form">
+            <div class="input-box flex">
+              <span>时间范围</span>
+              <div class="block">
+                <el-date-picker
+                  v-model="search_date.date"
+                  type="daterange"
+                  range-separator="-"
+                  start-placeholder="最早时间"
+                  end-placeholder="最晚时间"
+                  unlink-panels="true"
+                  style="width: 240px"
+                  value-format="YYYY-MM-DD"
+                />
+              </div>
+            </div>
+            <div class="input-box">
+              <span>状态</span>
+              <el-select
+                v-model="search_date.status"
+                placeholder="请选择"
+                style="width: 100px"
+              >
+                <el-option label="未审核" value="0" />
+                <el-option label="已审核" value="1" />
+                <el-option label="已退货" value="2" />
+                <el-option label="全部" value="" />
+              </el-select>
+            </div>
+            <div class="button" @click="search">查询</div>
+          </form>
+          <section class="button-box">
+            <div class="button cash" @click="addorder">
+              进行结账(新增销售单)
+            </div>
+          </section>
+          <section class="order-box">
+            <div class="info-box">
+              <div class="info" v-for="item in order_info">
+                <span>{{ item.label }}</span>
+                <div class="data">{{ item.value }}</div>
+              </div>
+            </div>
+            <el-table
+              ref="multipleTableRef"
+              :data="tableData"
+              table-layout="auto"
+              v-loading="loading"
+              class="table-box"
+            >
+              <el-table-column
+                v-for="item in tableTitle"
+                :prop="item.props"
+                :label="item.label"
+                align="center"
+              />
+            </el-table>
+          </section>
+          <section class="button-box page">
+            <div class="button" @click="prev">上一页</div>
+            <div class="button refund" @click="returnVisible = true">退货</div>
+            <div class="button refund" @click="checkVisible = true">审核</div>
+            <div class="button" @click="next">下一页</div>
+            <div class="wrapper">
+              <span>当前页面：</span
+              ><input
+                class="page-index"
+                type="number"
+                @blur="jumpTo"
+                v-model="page_index"
+              />
+              <div class="total-data">共有{{ total_page_number }}单</div>
+            </div>
+          </section>
+          <el-dialog v-model="dialogVisible" width="600" draggable>
+            <OrderPanel
+              title="销售单结账进行中"
+              @getvisible="emitsGetvisible"
+            />
+          </el-dialog>
+          <el-dialog v-model="returnVisible" width="350">
+            <div class="title">
+              <h3>退回订单</h3>
+            </div>
+            <div class="warning-box">
+              <div class="content">您确定要进行退货操作吗</div>
+              <div class="button-box">
+                <div class="button" @click="refund">确认</div>
+                <div class="button" @click="returnVisible = false">取消</div>
+              </div>
+            </div>
+          </el-dialog>
+          <el-dialog v-model="checkVisible" width="350">
+            <div class="title">
+              <h3>审核订单</h3>
+            </div>
+            <div class="warning-box">
+              <div class="content">订单是否核对正确</div>
+              <div class="button-box">
+                <div class="button" @click="check">确认审核</div>
+                <div class="button" @click="checkVisible = false">取消</div>
+              </div>
+            </div>
+          </el-dialog>
+        </el-main>
+        <el-footer>
+          <div class="copyright">Copyright © , All Rights Reserved.</div>
+          <div class="more">
+            <span>Simon</span>
+            <el-divider direction="vertical" />
+            <span>Web</span>
+            <el-divider direction="vertical" />
+            <span>Watermark</span>
+          </div>
+        </el-footer>
+      </el-container>
+    </el-scrollbar>
+  </div>
 </template>
 
 <style lang="scss" scoped>
