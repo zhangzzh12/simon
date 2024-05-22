@@ -172,6 +172,7 @@ const getGoods = async () => {
 };
 
 const onSizeChange = (size: number) => {
+  formModel.value.page = 1;
   formModel.value.pageSize = size;
   getGoods();
 };
@@ -207,8 +208,8 @@ const delAllClick = async () => {
     getGoods();
   }
 };
-const Query = async () => {
-  await getGoods();
+const Query = () => {
+  getGoods();
 };
 const onSuccess = () => {
   getGoods();
@@ -241,7 +242,6 @@ onMounted(() => {
               style="width: 120px"
             ></el-input>
           </el-form-item>
-
           <el-form-item label="售价" prop="outPriceLow">
             <el-input
               v-model="formModel.outPriceLow"

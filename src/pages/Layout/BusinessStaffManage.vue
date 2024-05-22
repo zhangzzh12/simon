@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import { useMenuStore } from "@/stores/menuData";
 import { onMounted, ref, reactive } from "vue";
-import { customerGetService, customerDeleteService } from "@/api/customer";
-import CustomerPanel from "@/components/CustomerPanel.vue";
+import {
+  bussinessStaffGetService,
+  bussinessStaffDeleteService,
+  bussinessStaffPostService,
+  bussinessStaffPutService,
+} from "@/api/bussinessStaff";
 const { title } = useMenuStore();
 const customerRef = ref();
+//职位列表
+const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
 // 查询量
 const search_date = reactive({
   page: 1,
   pageSize: 10,
   name: "",
-  kind: "",
-  address: "",
+  job: "",
 });
 //加载值
 const loading = ref(false);
@@ -20,27 +25,26 @@ const idList = ref([]);
 // 表格数据
 const tableData = ref([]);
 const tableTitle = [
-  { prop: "name", label: "客户姓名" },
-  { prop: "kind", label: "客户类别" },
-  { prop: "address", label: "地址" },
-  { prop: "phoneNum", label: "电话" },
+  { prop: "name", label: "姓名" },
+  { prop: "username", label: "用户名" },
+  { prop: "gender", label: "性别" },
+  { prop: "job", label: "工作" },
 ];
 //总页数
 const total_page_number = ref(0);
-//弹框
-const dialogVisible = ref(false);
 //获取客户信息列表
-const getCustomer = async () => {
+const getbussinessStaff = async () => {
   loading.value = true;
-  const res = await customerGetService(search_date);
+  const res = await bussinessStaffGetService(search_date);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
   tableData.value.forEach((item) => {
-    if (item.kind === 1) {
-      item.kind = "零售客户";
-    } else {
-      item.kind = "批发客户";
+    if (item.gender === 1) {
+      item.gender = "男";
+    } else if (item.gender === 2) {
+      item.gender = "女";
     }
+    item.job = jobList.value[0];
   });
   loading.value = false;
 };
@@ -48,15 +52,15 @@ const getCustomer = async () => {
 const onSizeChange = (size: number) => {
   search_date.page = 1;
   search_date.pageSize = size;
-  getCustomer();
+  getbussinessStaff();
 };
 //页数改变
 const onCurrentChange = (page: number) => {
   search_date.page = page;
-  getCustomer();
+  getbussinessStaff();
 };
 const Query = () => {
-  getCustomer();
+  getbussinessStaff();
 };
 const selectionLineChangeHandle = (rows) => {
   rows.forEach((row) => {
@@ -67,44 +71,48 @@ const selectionLineChangeHandle = (rows) => {
   });
 };
 const onSuccess = () => {
-  getCustomer();
+  getbussinessStaff();
 };
-//新增客户信息
+//新增商务人员信息
 const addClick = (row) => {
-  customerRef.value.open(row, "新增客户信息");
+  customerRef.value.open(row, "新增商务人员信息");
 };
-//编辑客户信息
+//编辑商务人员信息
 const editClick = (row) => {
-  customerRef.value.open(row, "编辑客户信息");
+  customerRef.value.open(row, "编辑商务人员信息");
 };
 //删除
 const Delete = async (row) => {
-  await ElMessageBox.confirm("您确定要删除该货品信息吗", "删除货品信息", {
+  await bussinessStaffDeleteService(row.id);
+  await ElMessageBox.confirm("您确定要删除商务人员信息吗", "删除商务人员信息", {
     type: "warning",
     confirmButtonText: "确定",
     cancelButtonText: "取消",
   });
-  await customerDeleteService(row.id);
-  getCustomer();
+  getbussinessStaff();
 };
 //批量删除
 const deleteAllClick = async () => {
   if (idList.value.length === 0) {
-    ElMessage.warning("请选择要删除的客户");
+    ElMessage.warning("请选择要删除的商务人员");
   } else {
-    await ElMessageBox.confirm("您确定要删除客户信息吗", "删除客户信息", {
-      type: "warning",
-      confirmButtonText: "确定",
-      cancelButtonText: "取消",
-    });
-    await customerDeleteService(idList.value);
-    getCustomer();
+    await ElMessageBox.confirm(
+      "您确定要删除商务人员信息吗",
+      "删除商务人员信息",
+      {
+        type: "warning",
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+      }
+    );
+    await bussinessStaffDeleteService(idList.value);
+    getbussinessStaff();
   }
 };
 onMounted(() => {
-  title.first = "客户管理";
+  title.first = "商务人员管理";
   title.second = "";
-  getCustomer();
+  getbussinessStaff();
 });
 </script>
 
@@ -115,48 +123,42 @@ onMounted(() => {
         <el-main>
           <form class="input-form">
             <div class="input-box">
-              <span>客户姓名</span>
+              <span>商务人员姓名</span>
               <el-input
                 v-model="search_date.name"
-                placeholder="请输入客户姓名"
+                placeholder="请输入商务人员姓名"
                 style="width: 150px"
                 clearable
               />
             </div>
             <div class="input-box">
-              <span>类别</span>
+              <span>职位</span>
               <el-select
-                v-model="search_date.kind"
+                v-model="search_date.job"
                 placeholder="请选择"
-                style="width: 100px"
+                style="width: 120px"
               >
                 <el-option label="请选择" value="" style="margin-left: 7px" />
+                <el-option label="店长" value="1" style="margin-left: 7px" />
+                <el-option label="收银员" value="2" style="margin-left: 7px" />
                 <el-option
-                  label="零售客户"
-                  value="1"
+                  label="仓库管理员"
+                  value="3"
                   style="margin-left: 7px"
                 />
+                <el-option label="售货员" value="4" style="margin-left: 7px" />
                 <el-option
-                  label="批发客户"
-                  value="2"
+                  label="采购人员"
+                  value="5"
                   style="margin-left: 7px"
                 />
               </el-select>
             </div>
-            <div class="input-box">
-              <span>地址</span>
-              <el-input
-                v-model="search_date.address"
-                placeholder="请输入客户地址"
-                style="width: 150px"
-                clearable
-              />
-            </div>
             <div class="button" @click="Query">查询</div>
           </form>
           <section class="button-box">
-            <div class="button" @click="addClick">+ 新增客户信息</div>
-            <div class="button" @click="deleteAllClick">- 批量删除客户信息</div>
+            <div class="button" @click="addClick">+ 新增商务人员</div>
+            <div class="button" @click="deleteAllClick">- 批量删除商务人员</div>
           </section>
           <section class="order-box">
             <el-table
@@ -210,14 +212,6 @@ onMounted(() => {
               />
             </div>
           </section>
-          <el-dialog v-model="dialogVisible" width="350">
-            <AddEmpPanel title="修改员工">
-              <template v-slot:button>
-                <el-button type="primary" @click="">保存</el-button>
-                <el-button type="primary" @click="">取消</el-button>
-              </template>
-            </AddEmpPanel>
-          </el-dialog>
         </el-main>
         <el-footer>
           <div class="copyright">Copyright © , All Rights Reserved.</div>
@@ -318,7 +312,6 @@ onMounted(() => {
       display: flex;
       position: relative;
       margin-top: 15px;
-
       &.page {
         justify-content: space-between;
         align-items: center;

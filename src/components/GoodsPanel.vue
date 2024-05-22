@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, onMounted } from "vue";
+import { ref, defineEmits } from "vue";
 import { useGoodsDataStore } from "@/stores/goodsData";
 import {
   goodsPostService,
@@ -219,7 +219,7 @@ const onSubmit = async () => {
       <el-form-item v-if="formInline.id === ''" label="货品编号" prop="code">
         <el-input
           v-model="formInline.code"
-          placeholder="请输入货品编号"
+          placeholder="编号示例:S-02-5534,2是种类编号,5534"
           clearable
         />
       </el-form-item>
