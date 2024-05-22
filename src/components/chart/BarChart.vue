@@ -8,7 +8,7 @@ const props = defineProps({
         type: String,
     },
     xAxis:{
-        type: Array
+        type: Array,
     },
     chartData:{
         type:Array,
@@ -23,6 +23,7 @@ const option = reactive({
         text: props.chartTitle,
         textStyle: {
             fontSize: 30,
+            color: '#917800',
         },
         left: 'center',
     },
@@ -40,7 +41,8 @@ const option = reactive({
         {
         axisLabel:{
             interval:0,
-            rotate:45
+            rotate:45,
+            color: '#917800',
         },    
         data: props.xAxis,
     }
@@ -74,7 +76,7 @@ onMounted(()=>{
 </script>
 
 <template>
-    <div ref="chart" style="position: absolute;top: 0;left: 0;width: 100%;height: 100%;margin: 10px;"></div>
+    <div ref="chart" style="width: 100%;height: 100%;margin: 5px;"></div>
 </template>
 
 <style lang="scss" scoped></style>

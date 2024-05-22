@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { getOneWeekCost, getOneWeekProfit, getTodayMoney, getTotalOrderNum } from '@/api/statistics';
+import { getOneWeekCost, getOneWeekMoney, getOneWeekOrderNum, getOneWeekProfit, getTodayMoney, getTotalOrderNum } from '@/api/statistics';
 import { useMenuStore } from '@/stores/menuData';
 import { onMounted, reactive, ref } from 'vue';
+import LineChart from '@/components/chart/LineChart.vue';
 
 const loading = ref(false);
 const cost_list = ref([
    { label: '总点击量', value: 0 },
-   { label: '今日销售额', value: 0 },
+   { label: '近一周总销售额', value: 0 },
    { label: '近一周总成本', value: 0 },
    { label: '近一周总利润', value: 0 },
 ]);
@@ -32,12 +33,106 @@ const cost_statistic = async () => {
 };
 
 
+// 获取近一周的日期时间数据
+
+function getOneWeekDate(): string[] {
+   let weekDates: string[] = [];
+   let today = new Date();
+   for (var i = 0; i < 7; i++) {
+      let date = new Date(today);
+      date.setDate(today.getDate() - i);
+
+      let month = date.getMonth() + 1;
+      let day = date.getDate();
+
+      // 格式化月份和日期，保证为两位数
+      let formattedMonth = month < 10 ? '0' + month : month;
+      let formattedDay = day < 10 ? '0' + day : day;
+
+      weekDates.push(formattedMonth + '-' + formattedDay);
+   }
+   return weekDates.reverse();
+}
+
+// 销量管理
+
+const OrderLineyAxisData = reactive({
+   name: '下单数(/单)',
+   type: 'value',
+   nameTextStyle: {
+      color: '#917800',
+      fontSize: '14px',
+   }
+});
+
+const OrderLinexAxisData = reactive({
+   type: 'category',
+   data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+   axisLabel: {
+      color: '#917800',
+   }
+});
+
+const SalesData = ref([
+   {
+      name: '订单',
+      data: [150, 230, 224, 218, 135, 147, 260],
+      type: 'line'
+   }
+]);
+
+const setOneWeekOrderNum = async () => {
+   const res = await getOneWeekOrderNum();
+   OrderLinexAxisData.data = getOneWeekDate();
+   SalesData.value[0].data = res.data.data;
+}
+
+// 销售额统计
+
+const MoneyLineyAxisData = reactive({
+   name: '售额(/￥)',
+   type: 'value',
+   nameTextStyle: {
+      color: '#917800',
+      fontSize: '14px',
+   }
+}); 
+
+const MoneyLinexAxisData = reactive({
+   type: 'category',
+   data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
+   axisLabel: {
+      color: '#917800',
+   }
+});
+
+const MoneyData = ref([
+   {
+      name:'销售额',
+      data: [150, 230, 224, 218, 135, 147, 260],
+      type: 'line'
+   }
+]);
+
+const setOneWeekMoney = async () => {
+   const res = await getOneWeekMoney();
+   MoneyLinexAxisData.data = getOneWeekDate();
+   MoneyData.value[0].data = res.data.data;
+}
+
+
 //面包屑
-const { title } = useMenuStore();
+const { title, asideList_id } = useMenuStore();
 onMounted(() => {
    title.first = '首页';
    title.second = '';
    cost_statistic();
+   setOneWeekOrderNum();
+   setOneWeekMoney();
+   for (let i = 0; i < asideList_id.length; ++i) {
+      asideList_id[i] = '';
+   }
+   asideList_id[1] = 'active';
 });
 
 </script>
@@ -50,13 +145,30 @@ onMounted(() => {
                <section class="cost-wrapper">
                   <div class="cost-box" v-for="(item, index) in cost_list" v-loading="loading">
                      <div class="label">{{ item.label }}</div>
-                     <div class="value">{{ item.value }}<span v-show="index == 0">单</span><span v-show="index != 0">￥</span>
+                     <div class="value">{{ item.value }}<span v-show="index == 0">单</span><span
+                           v-show="index != 0">￥</span>
                      </div>
                   </div>
                </section>
-               <section class="oneWeek-wrapper">
-                  <div class="oneWeek-box"></div>
-                  <div class="oneWeek-box"></div>
+               <section class="central-wrapper">
+                  <el-row :gutter="50">
+                     <el-col :span="12">
+                        <div class="grid-content">
+                           <div class="box">
+                              <LineChart :chartTitle="'销量统计'" :y-axis="OrderLineyAxisData" :x-axis="OrderLinexAxisData"
+                                 :chartData="SalesData" :chartLegend="['订单']" />
+                           </div>
+                        </div>
+                     </el-col>
+                     <el-col :span="12">
+                        <div class="grid-content">
+                           <div class="box">
+                              <LineChart :chartTitle="'销售额统计'" :y-axis="MoneyLineyAxisData" :x-axis="MoneyLinexAxisData"
+                                 :chartData="MoneyData" :chartLegend="['销售额']"/>
+                           </div>
+                        </div>
+                     </el-col>
+                  </el-row>
                </section>
             </el-main>
             <el-footer>
@@ -119,12 +231,18 @@ onMounted(() => {
             border-radius: 12px;
             box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
             text-align: center;
-            @include background_color('bg-200');
+            @include background_color('bg-300');
+            transition: all .3s ease;
+
+            &:hover {
+               transform: translateY(-3%);
+            }
 
             .label {
                font-size: 20px;
                @include font_color('text-200');
                padding: 20px 10px 10px 10px;
+               user-select: none;
             }
 
             .value {
@@ -148,23 +266,27 @@ onMounted(() => {
          }
       }
 
-      .oneWeek-wrapper {
+      .central-wrapper {
          width: 100%;
-         display: flex;
-         justify-content: center;
-         align-items: center;
-         gap:400px;
-         margin-bottom: 50px;
+         padding: 0 50px;
+         margin-bottom: 120px;
 
-         .oneWeek-box {
-            height: 0;
-            position: relative;
-            padding-top: 22%;
-            width: 40%;
+         .box {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            padding: 20px;
             border-radius: 12px;
             box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
             @include background_color('bg-200');
+            transition: all .3s ease;
+
+            &:hover {
+               transform: translateY(-3%);
+            }
          }
+
+
       }
    }
 
@@ -192,5 +314,24 @@ onMounted(() => {
          align-items: center;
       }
    }
+}
+</style>
+
+<style>
+.el-row {
+   margin-bottom: 50px;
+}
+
+.el-row:last-child {
+   margin-bottom: 0;
+}
+
+.el-col {
+   border-radius: 12px;
+}
+
+.grid-content {
+   border-radius: 12px;
+   height: 45vh;
 }
 </style>

@@ -147,6 +147,7 @@ const out = () => {
     width: 100%;
     height: 80px;
     pointer-events: none;
+    user-select: none;
     /* ------- */
     font-size: 28px;
     opacity: 0;

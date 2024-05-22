@@ -10,9 +10,16 @@ export const useMenuStore = defineStore('menu',()=>{
 
     const asideList_id = ref(['active','','','','','','']);
 
+    const warehouse = reactive({
+        active_list: ['active','', ''],
+        number: 0,
+        name: '店铺'
+    });
+
     return {
         title,
-        asideList_id
+        asideList_id,
+        warehouse
     }
 },{
     persist:true,// 是否选择持续化存储
