@@ -20,10 +20,10 @@ export const useWareDataStore = defineStore('waredata', () => {
     time: ''
   });
   const Warehouse = reactive<{
-    status: string[],
+    index: string,
     WarehouseList: WarehouseItem[]
   }>({
-    status: [],
+    index: '店铺',
     WarehouseList: []
   });
   return {

@@ -19,6 +19,7 @@ import { useWareDataStore } from "@/stores/WarehouseData";
 import { formatTime, format } from "@/utils/format.ts";
 const { formInline, Warehouse } = useWareDataStore();
 const useWareData = useWareDataStore();
+const { title, asideList_id, warehouse } = useMenuStore();
 // 获取仓库列表
 const getWarehouseList = async () => {
   const res = await warehouseListGetService();
@@ -127,7 +128,7 @@ const num = ref(0);
 const search_date = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: 0,
+  warehouseNum: warehouse.number,
   name: "",
   kind: "",
 });
@@ -135,7 +136,7 @@ const search_date = ref({
 const search_bill = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: 0,
+  warehouseNum: warehouse.number,
   day: "",
 });
 //加载值
@@ -152,7 +153,7 @@ const billlist = ref();
 //台账数据
 const bill = ref({
   id: "",
-  location: 0,
+  location: warehouse.number,
   code: "",
   number: "",
   name: "",
@@ -161,7 +162,7 @@ const bill = ref({
 });
 const submitBill = ref({
   id: "",
-  location: 0,
+  location: warehouse.number,
   code: "",
   number: 0,
   name: "",
@@ -226,7 +227,7 @@ const addGoods = () => {
   formInline.name = "";
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = 0;
+  formInline.location = warehouse.number;
   formInline.code = "";
   formInline.number = "";
   dialogVisible.value = true;
@@ -237,7 +238,7 @@ const inWarehouse = (row) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = 0;
+  formInline.location = warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   inWarehouseVisible.value = true;
@@ -259,7 +260,7 @@ const outWarehouse = (row) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = 0;
+  formInline.location = warehouse_number;
   formInline.code = row.code;
   formInline.number = "";
   num.value = row.number;
@@ -327,10 +328,9 @@ const revoke = async (row) => {
   billGet();
 };
 //面包屑
-const { title, asideList_id, warehouse_id } = useMenuStore();
 onMounted(() => {
   title.first = "仓库管理";
-  title.second = "店铺";
+  title.second = warehouse.name;
   goodsGet();
   countList();
   billGet();
@@ -345,10 +345,13 @@ const inWarehouseVisible = ref(false);
 const outWarehouseVisible = ref(false);
 
 const warehouse_toggle = (id: number) => {
-  for (let i = 0; i < warehouse_id.length; ++i) {
-    warehouse_id[i] = '';
+  for (let i = 0; i < warehouse.active_list.length; ++i) {
+    warehouse.active_list[i] = '';
   }
-  warehouse_id[id] = 'active';
+  warehouse.active_list[id] = 'active';
+  warehouse.number = Warehouse.WarehouseList[id].code;
+  warehouse.name = Warehouse.WarehouseList[id].name;
+  location.reload();
 };
 </script>
 
@@ -365,7 +368,7 @@ const warehouse_toggle = (id: number) => {
                     <div class="warehouse-list">
                       <h3>店铺/仓库列表</h3>
                       <div class="warehouse-btn" v-for="(item, index) in Warehouse.WarehouseList"
-                        @click="warehouse_toggle(index)" :class="warehouse_id[index]">
+                        @click="warehouse_toggle(index)" :class="warehouse.active_list[index]">
                         {{ item.name }}
                       </div>
                     </div>

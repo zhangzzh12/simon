@@ -4,7 +4,7 @@ export const warehouseListGetService = () => {
   return request.get("/gethouseList");
 };
 
-export const warehouseGetService = (params) => {
+export const warehouseGetService = (params) => { 
   return request.get("/warehouse", { params });
 };
 export const warehouseCountGetService = (id: number) => {
