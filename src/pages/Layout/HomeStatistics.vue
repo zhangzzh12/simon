@@ -7,7 +7,7 @@ import LineChart from '@/components/chart/LineChart.vue';
 const loading = ref(false);
 const cost_list = ref([
    { label: '总点击量', value: 0 },
-   { label: '今日销售额', value: 0 },
+   { label: '近一周总销售额', value: 0 },
    { label: '近一周总成本', value: 0 },
    { label: '近一周总利润', value: 0 },
 ]);
@@ -35,8 +35,8 @@ const cost_statistic = async () => {
 
 // 获取近一周的日期时间数据
 
-function getOneWeekDate():string[]{
-   let weekDates:string[] = [];
+function getOneWeekDate(): string[] {
+   let weekDates: string[] = [];
    let today = new Date();
    for (var i = 0; i < 7; i++) {
       let date = new Date(today);
@@ -57,7 +57,12 @@ function getOneWeekDate():string[]{
 // 销量管理
 
 const OrderLineyAxisData = reactive({
+   name: '下单数(/单)',
    type: 'value',
+   nameTextStyle: {
+      color: '#917800',
+      fontSize: '14px',
+   }
 });
 
 const OrderLinexAxisData = reactive({
@@ -70,6 +75,7 @@ const OrderLinexAxisData = reactive({
 
 const SalesData = ref([
    {
+      name: '订单',
       data: [150, 230, 224, 218, 135, 147, 260],
       type: 'line'
    }
@@ -84,8 +90,13 @@ const setOneWeekOrderNum = async () => {
 // 销售额统计
 
 const MoneyLineyAxisData = reactive({
+   name: '售额(/￥)',
    type: 'value',
-});
+   nameTextStyle: {
+      color: '#917800',
+      fontSize: '14px',
+   }
+}); 
 
 const MoneyLinexAxisData = reactive({
    type: 'category',
@@ -97,6 +108,7 @@ const MoneyLinexAxisData = reactive({
 
 const MoneyData = ref([
    {
+      name:'销售额',
       data: [150, 230, 224, 218, 135, 147, 260],
       type: 'line'
    }
@@ -110,13 +122,17 @@ const setOneWeekMoney = async () => {
 
 
 //面包屑
-const { title } = useMenuStore();
+const { title, asideList_id } = useMenuStore();
 onMounted(() => {
    title.first = '首页';
    title.second = '';
    cost_statistic();
    setOneWeekOrderNum();
    setOneWeekMoney();
+   for (let i = 0; i < asideList_id.length; ++i) {
+      asideList_id[i] = '';
+   }
+   asideList_id[1] = 'active';
 });
 
 </script>
@@ -140,7 +156,7 @@ onMounted(() => {
                         <div class="grid-content">
                            <div class="box">
                               <LineChart :chartTitle="'销量统计'" :y-axis="OrderLineyAxisData" :x-axis="OrderLinexAxisData"
-                                 :chartData="SalesData" />
+                                 :chartData="SalesData" :chartLegend="['订单']" />
                            </div>
                         </div>
                      </el-col>
@@ -148,7 +164,7 @@ onMounted(() => {
                         <div class="grid-content">
                            <div class="box">
                               <LineChart :chartTitle="'销售额统计'" :y-axis="MoneyLineyAxisData" :x-axis="MoneyLinexAxisData"
-                                 :chartData="MoneyData" />
+                                 :chartData="MoneyData" :chartLegend="['销售额']"/>
                            </div>
                         </div>
                      </el-col>

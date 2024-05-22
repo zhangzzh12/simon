@@ -1,4 +1,9 @@
 import request from "@/utils/request";
+
+export const warehouseListGetService = () => {
+  return request.get("/gethouseList");
+};
+
 export const warehouseGetService = (params) => {
   return request.get("/warehouse", { params });
 };

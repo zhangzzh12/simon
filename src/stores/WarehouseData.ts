@@ -1,9 +1,15 @@
 import { defineStore } from 'pinia'
-import { ref,reactive } from 'vue';
+import { reactive } from 'vue';
+
+interface WarehouseItem {
+  id: number,
+  name: string,
+  code: number
+}
 
 export const useWareDataStore = defineStore('waredata', () => {
   const formInline = reactive({
-    id:0,
+    id: 0,
     name: '',
     number: '',
     kind: '',
@@ -11,11 +17,17 @@ export const useWareDataStore = defineStore('waredata', () => {
     location: 0,
     code: '',
     inPrice: '',
-    time:''
+    time: ''
   });
-  const houseNumber = ref(0) 
+  const Warehouse = reactive<{
+    status: string[],
+    WarehouseList: WarehouseItem[]
+  }>({
+    status: [],
+    WarehouseList: []
+  });
   return {
     formInline,
-    houseNumber
+    Warehouse
   }
 })

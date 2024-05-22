@@ -58,10 +58,14 @@ const { title } = useMenuStore();
               <i class="bx" :class="value.iconType"></i>
               <span>{{ value.title }}</span>
             </li>
+            <li id="toggle" @click="themeModelBtn">
+              <i class='bx' :class="themeStyle.btn_icon"></i>
+              <span>主题</span>
+            </li>
           </ul>
           <div class="homepage-box">
             <div class="user-img"></div>
-            <div class="personal-name"><span>你好!Simon</span></div>
+            <div class="personal-name"><span>你好!Simon<br />店员</span></div>
           </div>
         </el-header>
         <el-main>
@@ -186,6 +190,24 @@ const { title } = useMenuStore();
           }
         }
 
+        #toggle {
+          border: 2px solid;
+          @include border_color('text-100');
+          box-shadow: 0 0 6px rgba(0, 0, 0, .9);
+          border-radius: 50%;
+          padding: 8px;
+          transition: transform .2s ease;
+          @include background_color('bg-300');
+
+          &:hover {
+            transform: scale(1.03);
+          }
+
+          &:active {
+            transform: scale(0.99);
+          }
+        }
+
       }
 
       .homepage-box {
@@ -201,7 +223,7 @@ const { title } = useMenuStore();
           }
 
           .personal-name {
-            transform: translateY(100%);
+            transform: translate(-100%, -50%);
             opacity: 1;
           }
         }

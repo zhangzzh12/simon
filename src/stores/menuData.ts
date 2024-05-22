@@ -10,9 +10,12 @@ export const useMenuStore = defineStore('menu',()=>{
 
     const asideList_id = ref(['active','','','','','','']);
 
+    const warehouse_id = ref(['active','', '']);
+
     return {
         title,
-        asideList_id
+        asideList_id,
+        warehouse_id
     }
 },{
     persist:true,// 是否选择持续化存储

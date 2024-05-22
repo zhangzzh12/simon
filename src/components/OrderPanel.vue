@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive } from "vue";
-import type { FormInstance } from "element-plus";
+import { type FormInstance } from "element-plus";
 import { useOrderDataStore } from "@/stores/orderData";
 import { saveOrderpostService } from "@/api/order";
 
@@ -36,6 +36,7 @@ const removeDomain = (item: DomainItem) => {
 };
 
 const addDomain = () => {
+  
   dynamicValidateForm.domains.push({
     key: Date.now(),
     value: "",
@@ -45,27 +46,32 @@ const addDomain = () => {
 
 const emits = defineEmits(["getvisible"]);
 
+const loading = ref(false);
+
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
   if (dynamicValidateForm.domains.length < 1) {
     ElMessage.warning("没有任何货品呢");
     return;
   }
-  console.log(formInline);
-  formInline.goodList = [];
-  formInline.numberList = [];
-  console.log(formInline);
+  loading.value = true;
   for (let i = 0; i < dynamicValidateForm.domains.length; ++i) {
     formInline.goodList[i] = dynamicValidateForm.domains[i].value;
     formInline.numberList[i] = dynamicValidateForm.domains[i].number;
   }
 
-  const res = await saveOrderpostService(formInline);
+  await saveOrderpostService(formInline).then(()=>{
+    ElMessage.success('新增成功！');
+  }).catch(()=>{
+    ElMessage.error('新增失败！');
+  });
+  loading.value = false;
   emits("getvisible", false);
+
 };
 
 // 使用 debounce 函数创建一个防抖版本的 submit 函数
-const debouncedSubmit = debounce(submitForm, 300); // 设置延迟时间为 300 毫秒
+const debouncedSubmit = debounce(submitForm, 5000); // 设置延迟时间为 5000秒
 
 const resetForm = (formEl: FormInstance | undefined) => {
   dynamicValidateForm.domains.forEach((element) => {
@@ -81,40 +87,19 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="background">
+  <div class="background"  :v-loading="loading">
     <div class="title">
       <h3>{{ props.title }}</h3>
     </div>
-    <el-form
-      ref="formRef"
-      style="max-width: 600px"
-      :model="dynamicValidateForm"
-      label-width="auto"
-      class="demo-dynamic"
-    >
-      <el-form-item
-        v-for="(domain, index) in dynamicValidateForm.domains"
-        :key="domain.key"
-        :label="'货品' + (index + 1)"
-        :prop="'domains.' + index + '.value'"
-        :inline="true"
-        class="wareItem"
-      >
-        <span>货品编号</span
-        ><el-input v-model="domain.value" style="width: 120px" />
-        <span>交易数量</span
-        ><el-input-number
-          v-model="domain.number"
-          :min="1"
-          :max="1000"
-          style="width: 90px"
-          size="small"
-        />
-        <el-button
-          @click.prevent="removeDomain(domain)"
-          style="border-radius: 50%; padding: 8px; margin-left: 15px"
-          ><i class="bx bx-x"></i
-        ></el-button>
+    <el-form ref="formRef" style="max-width: 600px" :model="dynamicValidateForm" label-width="auto"
+      class="demo-dynamic">
+      <el-form-item v-for="(domain, index) in dynamicValidateForm.domains" :key="domain.key" :label="'货品' + (index + 1)"
+        :prop="'domains.' + index + '.value'" :inline="true" class="wareItem">
+        <span>货品编号</span><el-input v-model="domain.value" style="width: 120px" />
+        <span>交易数量</span><el-input-number v-model="domain.number" :min="1" :max="1000" style="width: 90px"
+          size="small" />
+        <el-button @click.prevent="removeDomain(domain)" style="border-radius: 50%; padding: 8px; margin-left: 15px"><i
+            class="bx bx-x"></i></el-button>
       </el-form-item>
       <el-form-item>
         <div class="button-box">

@@ -10,14 +10,20 @@ import {
   inwarehousePostService,
   outwarehousePostService,
   billGetService,
+  warehouseListGetService,
 } from "@/api/warehouse";
 import WarehousePanel from "@/components/WarehousePanel.vue";
 import OutwarehousePanel from "@/components/OutwarehousePanel.vue";
 import InwarehousePanel from "@/components/InwarehousePanel.vue";
 import { useWareDataStore } from "@/stores/WarehouseData";
 import { formatTime, format } from "@/utils/format.ts";
-const { formInline } = useWareDataStore();
+const { formInline, Warehouse } = useWareDataStore();
 const useWareData = useWareDataStore();
+// 获取仓库列表
+const getWarehouseList = async () => {
+  const res = await warehouseListGetService();
+  Warehouse.WarehouseList = res.data.data;
+}
 // 种类列表名称
 const goodsName = ref([
   "日用品类",
@@ -226,7 +232,7 @@ const addGoods = () => {
   dialogVisible.value = true;
 };
 //入库操作
-const inWarehouse = async (row) => {
+const inWarehouse = (row) => {
   formInline.id = row.id;
   formInline.name = row.name;
   formInline.inPrice = "";
@@ -248,7 +254,7 @@ const inWarehouseOperation = async () => {
   }
 };
 //出库操作
-const outWarehouse = async (row) => {
+const outWarehouse = (row) => {
   formInline.id = row.id;
   formInline.name = row.name;
   formInline.inPrice = "";
@@ -321,13 +327,14 @@ const revoke = async (row) => {
   billGet();
 };
 //面包屑
-const { title } = useMenuStore();
+const { title, asideList_id, warehouse_id } = useMenuStore();
 onMounted(() => {
   title.first = "仓库管理";
   title.second = "店铺";
   goodsGet();
   countList();
   billGet();
+  getWarehouseList();
 });
 
 //新增货品项显示与隐藏
@@ -336,6 +343,13 @@ const dialogVisible = ref(false);
 const inWarehouseVisible = ref(false);
 //出库显示与隐藏
 const outWarehouseVisible = ref(false);
+
+const warehouse_toggle = (id: number) => {
+  for (let i = 0; i < warehouse_id.length; ++i) {
+    warehouse_id[i] = '';
+  }
+  warehouse_id[id] = 'active';
+};
 </script>
 
 <template>
@@ -343,40 +357,42 @@ const outWarehouseVisible = ref(false);
     <el-scrollbar>
       <el-container style="display: flex; justify-content: space-between">
         <el-main>
-          <section class="statistic-box">
-            <div class="bar-box">
-              <BarChart
-                chartTitle="仓位速览"
-                :xAxis="goodsName"
-                :chartData="mergedData"
-              />
-            </div>
+          <section class="central-wrapper">
+            <el-row :gutter="50">
+              <el-col :span="4">
+                <div class="grid-content">
+                  <div class="box">
+                    <div class="warehouse-list">
+                      <h3>店铺/仓库列表</h3>
+                      <div class="warehouse-btn" v-for="(item, index) in Warehouse.WarehouseList"
+                        @click="warehouse_toggle(index)" :class="warehouse_id[index]">
+                        {{ item.name }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </el-col>
+              <el-col :span="20">
+                <div class="grid-content">
+                  <div class="box">
+                    <BarChart chartTitle="仓位速览" :xAxis="goodsName" :chartData="mergedData" />
+                  </div>
+                </div>
+              </el-col>
+            </el-row>
           </section>
           <section class="data-box">
             <div class="showdata-box">
               <form class="input-form">
                 <div class="input-box">
                   <span>货品名称</span>
-                  <el-input
-                    v-model="search_date.name"
-                    placeholder="请输入货品名称"
-                    style="width: 150px"
-                  />
+                  <el-input v-model="search_date.name" placeholder="请输入货品名称" style="width: 150px" />
                 </div>
                 <div class="input-box">
                   <span>种类</span>
-                  <el-select
-                    v-model="search_date.kind"
-                    placeholder="请选择"
-                    style="width: 100px"
-                  >
-                    <el-option
-                      v-for="goods in goodsKind"
-                      style="margin-left: 10px"
-                      :value="goods.id"
-                      :key="goods.id"
-                      :label="goods.name"
-                    >
+                  <el-select v-model="search_date.kind" placeholder="请选择" style="width: 100px">
+                    <el-option v-for="goods in goodsKind" style="margin-left: 10px" :value="goods.id" :key="goods.id"
+                      :label="goods.name">
                     </el-option>
                   </el-select>
                 </div>
@@ -386,55 +402,21 @@ const outWarehouseVisible = ref(false);
                 <div class="button" @click="addGoods">+ 新增货品项</div>
               </section>
               <section class="table-box">
-                <el-table
-                  ref="multipleTableRef"
-                  :data="tableData"
-                  table-layout="auto"
-                  v-loading="loading"
-                >
-                  <el-table-column
-                    v-for="item in tableTitle"
-                    :prop="item.props"
-                    :label="item.label"
-                    align="center"
-                  />
+                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
+                  <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label" align="center" />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button
-                        type="primary"
-                        size="small"
-                        @click.prevent="inWarehouse(row)"
-                        >入库</el-button
-                      >
-                      <el-button
-                        link
-                        type="primary"
-                        size="small"
-                        @click.prevent="outWarehouse(row)"
-                        >出库</el-button
-                      >
-                      <el-button
-                        link
-                        type="primary"
-                        size="small"
-                        @click.prevent=""
-                        >调拨货品</el-button
-                      >
+                      <el-button type="primary" size="small" @click.prevent="inWarehouse(row)">入库</el-button>
+                      <el-button link type="primary" size="small" @click.prevent="outWarehouse(row)">出库</el-button>
+                      <el-button link type="primary" size="small" @click.prevent="">调拨货品</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination
-                    v-model:current-page="search_date.page"
-                    v-model:page-size="search_date.pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :background="true"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_page_number"
-                    @size-change="onSizeChange"
-                    @current-change="onCurrentChange"
-                    style="margin-top: 5px; justify-content: end"
-                  />
+                  <el-pagination v-model:current-page="search_date.page" v-model:page-size="search_date.pageSize"
+                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_page_number" @size-change="onSizeChange" @current-change="onCurrentChange"
+                    style="margin-top: 5px; justify-content: end" />
                 </div>
               </section>
               <el-dialog v-model="inWarehouseVisible" width="300">
@@ -481,69 +463,29 @@ const outWarehouseVisible = ref(false);
             <div class="ledger-box">
               <form class="input-form">
                 <el-form-item label="台账生成时间">
-                  <el-date-picker
-                    type="date"
-                    placeholder="请选择台账生成时间"
-                    v-model="search_bill.day"
-                    value-format="YYYY-MM-DD"
-                    clearable
-                    style="width: 200px"
-                  />
+                  <el-date-picker type="date" placeholder="请选择台账生成时间" v-model="search_bill.day"
+                    value-format="YYYY-MM-DD" clearable style="width: 200px" />
                 </el-form-item>
                 <div class="button" @click="queryBill">查询</div>
               </form>
               <section class="table-box ledger">
-                <el-table
-                  ref="multipleTableRef"
-                  :data="billList"
-                  table-layout="auto"
-                  v-loading="load"
-                >
-                  <el-table-column
-                    prop="time"
-                    label="日期"
-                    align="center"
-                    width="150"
-                  />
-                  <el-table-column
-                    prop="name"
-                    label="货品名称"
-                    align="center"
-                    width="150"
-                  />
-                  <el-table-column
-                    prop="number"
-                    label="变动"
-                    align="center"
-                    width="80"
-                  />
+                <el-table ref="multipleTableRef" :data="billList" table-layout="auto" v-loading="load">
+                  <el-table-column prop="time" label="日期" align="center" width="150" />
+                  <el-table-column prop="name" label="货品名称" align="center" width="150" />
+                  <el-table-column prop="number" label="变动" align="center" width="80" />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button
-                        v-if="row.operator === 1"
-                        type="primary"
-                        size="small"
-                        @click.prevent="revoke(row)"
-                        >撤销</el-button
-                      >
-                      <el-button v-else type="primary" size="small" disabled
-                        >撤销</el-button
-                      >
+                      <el-button v-if="row.operator === 1" type="primary" size="small"
+                        @click.prevent="revoke(row)">撤销</el-button>
+                      <el-button v-else type="primary" size="small" disabled>撤销</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination
-                    v-model:current-page="search_bill.page"
-                    v-model:page-size="search_bill.pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :background="true"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_bill"
-                    @size-change="SizeChange"
-                    @current-change="CurrentChange"
-                    style="margin-top: 5px; justify-content: end"
-                  />
+                  <el-pagination v-model:current-page="search_bill.page" v-model:page-size="search_bill.pageSize"
+                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_bill" @size-change="SizeChange" @current-change="CurrentChange"
+                    style="margin-top: 5px; justify-content: end" />
                 </div>
               </section>
             </div>
@@ -621,6 +563,7 @@ const outWarehouseVisible = ref(false);
     }
 
     .table-box {
+      width: 100%;
       position: relative;
       box-shadow: -2px -2px 5px rgba(49, 61, 68, 0.5);
       border-top: 6px solid;
@@ -673,28 +616,86 @@ const outWarehouseVisible = ref(false);
       }
     }
 
-    .statistic-box {
+    .central-wrapper {
       width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-bottom: 50px;
+      padding: 0 50px;
+      margin-bottom: 120px;
 
-      .bar-box {
-        height: 0;
-        position: relative;
-        padding-top: 30%;
-        width: 70%;
+      .box {
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        padding: 20px;
         border-radius: 12px;
-        box-shadow: 10px 10px 10px rgba(49, 61, 68, 0.4);
-        @include background_color("bg-200");
+        box-shadow: 10px 10px 10px rgba(49, 61, 68, .4);
+        @include background_color('bg-200');
+        transition: all .3s ease;
+
+        &:hover {
+          transform: translateY(-3%);
+        }
       }
+
+      .warehouse-list {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 20px;
+        padding: 2px;
+
+        h3 {
+          user-select: none;
+          white-space: nowrap;
+          padding: 5px;
+          border-bottom: 2px solid;
+          @include border_color('text-200');
+          @include font_color('text-100');
+          margin-bottom: 10px;
+          overflow: hidden;
+        }
+
+        .warehouse-btn {
+          width: 100%;
+          user-select: none;
+          padding: 0 10px;
+          height: 35px;
+          @include background_color("bg-300");
+          @include border_color('text-100');
+          border: 2px solid;
+          @include font_color('text-100');
+          font-size: 16px;
+          border-radius: 5px;
+          transition: all 0.5s ease;
+          box-shadow: 0 0 4px rgba(49, 61, 68, 0.5);
+          text-align: center;
+          line-height: 35px;
+
+          &:hover {
+            scale: 1.05;
+            opacity: 0.8;
+          }
+
+          &:active {
+            scale: 0.98;
+          }
+
+          &.active {
+            border: none;
+            box-shadow: inset 5px 5px 5px rgba(49, 61, 68, .5);
+            @include background_color('bg-200');
+          }
+        }
+      }
+
     }
 
     .data-box {
       display: flex;
       justify-content: space-between;
       width: 100%;
+      padding: 0 20px;
 
       .input-form {
         padding: 15px 25px;
@@ -708,16 +709,16 @@ const outWarehouseVisible = ref(false);
 
         .input-box {
           @include font_color("text-100");
+          display: flex;
+          align-items: center;
+          flex-wrap: nowrap;
 
           span {
             margin-right: 10px;
             font-size: 16px;
+            white-space: nowrap;
           }
 
-          &.flex {
-            display: flex;
-            align-items: center;
-          }
         }
       }
 
@@ -747,6 +748,7 @@ const outWarehouseVisible = ref(false);
         padding-bottom: 40px;
         margin-right: 30px;
         @include background_color("bg-300");
+
         .ledger {
           box-shadow: 5px 5px 10px rgba(49, 61, 68, 0.8);
         }
@@ -778,5 +780,24 @@ const outWarehouseVisible = ref(false);
       align-items: center;
     }
   }
+}
+</style>
+
+<style>
+.el-row {
+  margin-bottom: 50px;
+}
+
+.el-row:last-child {
+  margin-bottom: 0;
+}
+
+.el-col {
+  border-radius: 12px;
+}
+
+.grid-content {
+  border-radius: 12px;
+  height: 45vh;
 }
 </style>
