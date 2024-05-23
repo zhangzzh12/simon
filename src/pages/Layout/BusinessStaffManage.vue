@@ -1,60 +1,54 @@
 <script setup lang="ts">
 import { useMenuStore } from "@/stores/menuData";
 import { onMounted, ref, reactive } from "vue";
+import BussinessPanel from "@/components/BussinessPanel.vue";
 import {
   bussinessStaffGetService,
   bussinessStaffDeleteService,
-  bussinessStaffPostService,
-  bussinessStaffPutService,
 } from "@/api/bussinessStaff";
 const { title } = useMenuStore();
-const customerRef = ref();
-//职位列表
-const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
-// 查询量
+const bussinessPanel = ref();
 const search_date = reactive({
   page: 1,
   pageSize: 10,
   name: "",
   job: "",
 });
-//加载值
 const loading = ref(false);
 //删除列表数据
 const idList = ref([]);
 // 表格数据
 const tableData = ref([]);
+const total_page_number = ref(0);
 const tableTitle = [
   { prop: "name", label: "姓名" },
   { prop: "username", label: "用户名" },
   { prop: "gender", label: "性别" },
   { prop: "job", label: "工作" },
 ];
-//总页数
-const total_page_number = ref(0);
+const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
 //获取客户信息列表
 const getbussinessStaff = async () => {
   loading.value = true;
   const res = await bussinessStaffGetService(search_date);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
+  console.log(tableData.value);
   tableData.value.forEach((item) => {
     if (item.gender === 1) {
       item.gender = "男";
     } else if (item.gender === 2) {
       item.gender = "女";
     }
-    item.job = jobList.value[0];
+    item.job = jobList.value[item.job - 1];
   });
   loading.value = false;
 };
-//每页展示的数量改变
 const onSizeChange = (size: number) => {
   search_date.page = 1;
   search_date.pageSize = size;
   getbussinessStaff();
 };
-//页数改变
 const onCurrentChange = (page: number) => {
   search_date.page = page;
   getbussinessStaff();
@@ -62,7 +56,7 @@ const onCurrentChange = (page: number) => {
 const Query = () => {
   getbussinessStaff();
 };
-const selectionLineChangeHandle = (rows) => {
+const selectionLineChangeHandle = (rows: any) => {
   rows.forEach((row) => {
     const id = row.id;
     if (!idList.value.includes(id)) {
@@ -70,19 +64,16 @@ const selectionLineChangeHandle = (rows) => {
     }
   });
 };
-const onSuccess = () => {
-  getbussinessStaff();
-};
 //新增商务人员信息
-const addClick = (row) => {
-  customerRef.value.open(row, "新增商务人员信息");
+const addClick = (row: any) => {
+  bussinessPanel.value.open(row, "新增商务人员信息");
 };
 //编辑商务人员信息
-const editClick = (row) => {
-  customerRef.value.open(row, "编辑商务人员信息");
+const editClick = (row: any) => {
+  bussinessPanel.value.open(row, "编辑商务人员信息");
 };
 //删除
-const Delete = async (row) => {
+const Delete = async (row: any) => {
   await bussinessStaffDeleteService(row.id);
   await ElMessageBox.confirm("您确定要删除商务人员信息吗", "删除商务人员信息", {
     type: "warning",
@@ -108,6 +99,9 @@ const deleteAllClick = async () => {
     await bussinessStaffDeleteService(idList.value);
     getbussinessStaff();
   }
+};
+const onSuccess = () => {
+  getbussinessStaff();
 };
 onMounted(() => {
   title.first = "商务人员管理";
@@ -194,10 +188,10 @@ onMounted(() => {
                 </template>
               </el-table-column>
             </el-table>
-            <CustomerPanel
-              ref="customerRef"
-              @success="onSuccess"
-            ></CustomerPanel>
+            <BussinessPanel
+              ref="bussinessPanel"
+              :onSuccess="onSuccess"
+            ></BussinessPanel>
             <div class="page-box">
               <el-pagination
                 v-model:current-page="search_date.page"

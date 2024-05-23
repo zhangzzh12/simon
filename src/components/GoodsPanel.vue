@@ -11,6 +11,7 @@ import { Plus } from "@element-plus/icons-vue";
 const { formInline } = useGoodsDataStore();
 const dialogVisible = ref(false);
 const tile = ref("");
+const ruleFormRef = ref();
 const goodsKind = ref([
   {
     id: "",
@@ -86,7 +87,7 @@ const rules = {
   code: [],
 };
 
-const open = async (row, title) => {
+const open = async (row, title: string) => {
   tile.value = title;
   formInline.id = "";
   formInline.name = "";
@@ -110,15 +111,18 @@ const open = async (row, title) => {
     formInline.goodsStatus = res.data.data.goodsStatus;
   }
   dialogVisible.value = true;
+  if (ruleFormRef.value) {
+    ruleFormRef.value.resetFields();
+  }
 };
- 
+
 defineExpose({
   open,
 });
 
 const emit = defineEmits(["success"]);
 
-const beforeAvatarUpload = (file) => {
+const beforeAvatarUpload = (file: File) => {
   const isJpgOrPng =
     file.name.endsWith(".jpg") ||
     file.name.endsWith(".jpeg") ||

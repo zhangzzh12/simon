@@ -13,8 +13,8 @@ const search_date = reactive({
   kind: "",
   address: "",
 });
-//加载值
 const loading = ref(false);
+const total_page_number = ref(0);
 //删除列表数据
 const idList = ref([]);
 // 表格数据
@@ -25,8 +25,6 @@ const tableTitle = [
   { prop: "address", label: "地址" },
   { prop: "phoneNum", label: "电话" },
 ];
-//总页数
-const total_page_number = ref(0);
 //弹框
 const dialogVisible = ref(false);
 //获取客户信息列表
@@ -58,7 +56,7 @@ const onCurrentChange = (page: number) => {
 const Query = () => {
   getCustomer();
 };
-const selectionLineChangeHandle = (rows) => {
+const selectionLineChangeHandle = (rows: any) => {
   rows.forEach((row) => {
     const id = row.id;
     if (!idList.value.includes(id)) {
@@ -70,15 +68,15 @@ const onSuccess = () => {
   getCustomer();
 };
 //新增客户信息
-const addClick = (row) => {
+const addClick = (row: any) => {
   customerRef.value.open(row, "新增客户信息");
 };
 //编辑客户信息
-const editClick = (row) => {
+const editClick = (row: any) => {
   customerRef.value.open(row, "编辑客户信息");
 };
 //删除
-const Delete = async (row) => {
+const Delete = async (row: any) => {
   await ElMessageBox.confirm("您确定要删除该货品信息吗", "删除货品信息", {
     type: "warning",
     confirmButtonText: "确定",

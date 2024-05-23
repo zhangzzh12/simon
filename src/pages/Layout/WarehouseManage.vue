@@ -233,7 +233,7 @@ const addGoods = () => {
   dialogVisible.value = true;
 };
 //入库操作
-const inWarehouse = (row) => {
+const inWarehouse = (row: any) => {
   formInline.id = row.id;
   formInline.name = row.name;
   formInline.inPrice = "";
@@ -255,7 +255,7 @@ const inWarehouseOperation = async () => {
   }
 };
 //出库操作
-const outWarehouse = (row) => {
+const outWarehouse = (row: any) => {
   console.log(row);
   formInline.id = row.id;
   formInline.name = row.name;
@@ -304,7 +304,6 @@ const CurrentChange = (page: number) => {
   billGet();
 };
 const revoke = async (row) => {
-  console.log(row);
   await ElMessageBox.confirm("您确定要撤销该货品台账吗", "撤销货品台账", {
     type: "warning",
     confirmButtonText: "确定",
