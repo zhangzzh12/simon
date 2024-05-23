@@ -1,33 +1,33 @@
-import { defineStore } from 'pinia'
-import { reactive } from 'vue';
+import { defineStore } from "pinia";
+import { reactive } from "vue";
 
 interface WarehouseItem {
-  id: number,
-  name: string,
-  code: number
+  id: number;
+  name: string;
+  code: number;
 }
 
-export const useWareDataStore = defineStore('waredata', () => {
+export const useWareDataStore = defineStore("waredata", () => {
   const formInline = reactive({
-    id: 0,
-    name: '',
-    number: '',
-    kind: '',
+    id: "",
+    name: "",
+    number: "",
+    kind: "",
     //必要数据
     location: 0,
-    code: '',
-    inPrice: '',
-    time: ''
+    code: "",
+    inPrice: "",
+    time: "",
   });
   const Warehouse = reactive<{
-    index: string,
-    WarehouseList: WarehouseItem[]
+    index: string;
+    WarehouseList: WarehouseItem[];
   }>({
-    index: '店铺',
-    WarehouseList: []
+    index: "店铺",
+    WarehouseList: [],
   });
   return {
     formInline,
-    Warehouse
-  }
-})
+    Warehouse,
+  };
+});

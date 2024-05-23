@@ -19,13 +19,21 @@ import { useWareDataStore } from "@/stores/WarehouseData";
 import { formatTime, format } from "@/utils/format.ts";
 const { formInline, Warehouse } = useWareDataStore();
 const useWareData = useWareDataStore();
-const { title, asideList_id, warehouse } = useMenuStore();
-// 获取仓库列表
+const { title, warehouse } = useMenuStore();
+const num = ref(0);
+const billList = ref();
+const billlist = ref();
+const tableData = ref();
+const load = ref(false);
+const total_bill = ref(0);
+const loading = ref(false);
+const goodsCountList = ref([]);
+const total_page_number = ref(0);
+
 const getWarehouseList = async () => {
   const res = await warehouseListGetService();
   Warehouse.WarehouseList = res.data.data;
 };
-// 种类列表名称
 const goodsName = ref([
   "日用品类",
   "食品类",
@@ -42,7 +50,6 @@ const goodsName = ref([
   "汽车配件类",
   "宠物用品类",
 ]);
-//货品种类对象
 const goodsKind = ref([
   {
     id: "",
@@ -105,8 +112,6 @@ const goodsKind = ref([
     name: "宠物用品类",
   },
 ]);
-// 仓库货品数量列表
-const goodsCountList = ref([]);
 const mergedData = ref([
   { name: "日用品类", value: "0" },
   { name: "食品类", value: "0" },
@@ -123,8 +128,6 @@ const mergedData = ref([
   { name: "汽车配件类", value: "0" },
   { name: "宠物用品类", value: "0" },
 ]);
-const num = ref(0);
-// 货品查询对象
 const search_date = ref({
   page: 1,
   pageSize: 10,
@@ -132,25 +135,12 @@ const search_date = ref({
   name: "",
   kind: "",
 });
-//台账查询对象
 const search_bill = ref({
   page: 1,
   pageSize: 10,
   warehouseNum: warehouse.number,
   day: "",
 });
-//加载值
-const loading = ref(false);
-const load = ref(false);
-//每页数据展示量
-const total_page_number = ref(0);
-const total_bill = ref(0);
-
-// 表格数据
-const tableData = ref();
-const billList = ref();
-const billlist = ref();
-//台账数据
 const bill = ref({
   id: "",
   location: warehouse.number,
@@ -217,13 +207,17 @@ const queryBill = () => {
 };
 //新增货品
 const onSubmit = async () => {
-  await warehousePostService(formInline);
-  goodsGet();
-  dialogVisible.value = false;
+  console.log(formInline);
+  const res = await warehousePostService(formInline);
+  if (res.data.msg === "success") {
+    goodsGet();
+    dialogVisible.value = false;
+  } else {
+    alert(res.data.msg);
+  }
 };
 //添加货品
 const addGoods = () => {
-  formInline.id = 0;
   formInline.name = "";
   formInline.inPrice = "";
   formInline.kind = "";
@@ -326,6 +320,7 @@ const revoke = async (row) => {
   console.log(submitBill.value);
   await billRevokeService(submitBill.value);
   billGet();
+  goodsGet();
 };
 //面包屑
 onMounted(() => {
@@ -401,6 +396,7 @@ const warehouse_toggle = (id: number) => {
                     v-model="search_date.name"
                     placeholder="请输入货品名称"
                     style="width: 150px"
+                    clearable
                   />
                 </div>
                 <div class="input-box">
@@ -423,7 +419,7 @@ const warehouse_toggle = (id: number) => {
                 <div class="button" @click="Query">查询</div>
               </form>
               <section class="button-box">
-                <div class="button" @click="addGoods">+ 新增货品项</div>
+                <div class="button" @click="addGoods">+ 新增货品</div>
               </section>
               <section class="table-box">
                 <el-table

@@ -6,28 +6,25 @@ import {
   bussinessStaffGetService,
   bussinessStaffDeleteService,
 } from "@/api/bussinessStaff";
-const { title } = useMenuStore();
+const idList = ref([]);
+const tableData = ref([]);
+const loading = ref(false);
 const bussinessPanel = ref();
+const total_page_number = ref(0);
+const { title } = useMenuStore();
+const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
 const search_date = reactive({
   page: 1,
   pageSize: 10,
   name: "",
   job: "",
 });
-const loading = ref(false);
-//删除列表数据
-const idList = ref([]);
-// 表格数据
-const tableData = ref([]);
-const total_page_number = ref(0);
 const tableTitle = [
   { prop: "name", label: "姓名" },
   { prop: "username", label: "用户名" },
   { prop: "gender", label: "性别" },
   { prop: "job", label: "工作" },
 ];
-const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
-//获取客户信息列表
 const getbussinessStaff = async () => {
   loading.value = true;
   const res = await bussinessStaffGetService(search_date);

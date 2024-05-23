@@ -10,6 +10,7 @@ import { imagePostService } from "@/api/upload";
 import { Plus } from "@element-plus/icons-vue";
 import { storeToRefs } from "pinia";
 const { formInline } = storeToRefs(useGoodsDataStore());
+const { setFormInline } = useGoodsDataStore();
 const dialogVisible = ref(false);
 const tile = ref("");
 const ruleFormRef = ref();
@@ -90,10 +91,11 @@ const rules = {
 
 const open = async (row: any, title: string) => {
   tile.value = title;
-  formInline.value = { ...row };
   if (tile.value === "编辑货品") {
     const res = await goodsChaService(row.id);
     formInline.value = { ...res.data.data };
+  } else {
+    setFormInline();
   }
   dialogVisible.value = true;
   if (ruleFormRef.value) {
@@ -132,9 +134,12 @@ const onSelectFile = async (uploadFile) => {
   }
 };
 const onSubmit = async () => {
+  console.log(formInline.value);
   if (formInline.value.id === "") {
+    console.log(formInline.value);
     await goodsPostService(formInline.value);
   } else {
+    console.log(formInline.value);
     await goodsPutService(formInline.value);
   }
   dialogVisible.value = false;
