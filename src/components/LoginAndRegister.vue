@@ -3,6 +3,7 @@ import { ref, onMounted, reactive } from 'vue';
 import { tokenStore } from '@/stores/tokenData.ts';
 import { postLogin } from '@/api/login';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 
 const router = useRouter();
 const user = reactive({
@@ -27,10 +28,10 @@ const sublim = async () => {
             token.token = res.data.data;         
             router.push('/');
         }else{
-            alert(res.data.msg);
+            ElMessage.error(res.data.msg);
         }
     } else {
-        alert('验证码错误');
+        ElMessage.error('验证码错误');
         dj();
     }
 };
