@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { customerPostService, customerPutService } from "@/api/customer";
 import { ref, defineEmits } from "vue";
-const dialogVisible = ref(false);
 const tile = ref("");
 const ruleFormRef = ref();
+const dialogVisible = ref(false);
+const emit = defineEmits(["success"]);
 let customer = ref({
   id: "",
   name: "",
@@ -11,7 +12,6 @@ let customer = ref({
   address: "",
   phoneNum: "",
 });
-const emit = defineEmits(["success"]);
 const open = (row, title: string) => {
   tile.value = title;
   customer.value = { ...row };

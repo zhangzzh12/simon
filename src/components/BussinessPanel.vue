@@ -11,7 +11,13 @@ const tile = ref("");
 const ruleFormRef = ref();
 const dialogVisible = ref(false);
 const emit = defineEmits(["success"]);
-const jobList = ref(["店长", "收银员", "仓库管理员", "售货员", "采购人员"]);
+const jobList = ref([
+  { id: "1", name: "店长" },
+  { id: "2", name: "收银员" },
+  { id: "3", name: "仓库管理员" },
+  { id: "4", name: "售货员" },
+  { id: "5", name: "采购人员" },
+]);
 const open = (row: any, title: string) => {
   tile.value = title;
   formInline.value = { ...row };
@@ -20,8 +26,9 @@ const open = (row: any, title: string) => {
     ruleFormRef.value.resetFields();
   }
 };
-const findById = () => {
-  jobList.value.forEach((element) => {});
+const findById = (job: any) => {
+  const kind = jobList.value.find((item) => item.id === job);
+  return kind ? kind.id : "";
 };
 const Submit = async () => {
   if (formInline.value.gender === "男") {
@@ -29,22 +36,12 @@ const Submit = async () => {
   } else if (formInline.value.gender === "女") {
     formInline.value.gender = "2";
   }
-  if (formInline.value.job === "店长") {
-    formInline.value.job = "1";
-  } else if (formInline.value.job === "收银员") {
-    formInline.value.job = "2";
-  } else if (formInline.value.job === "仓库管理员") {
-    formInline.value.job = "3";
-  } else if (formInline.value.gender === "售货员") {
-    formInline.value.job = "4";
-  } else if (formInline.value.gender === "采购人员") {
-    formInline.value.job = "5";
-  }
   if (formInline.value.id) {
-    console.log(formInline.value);
+    if (formInline.value.job !== "1" || "2" || "3" || "4" || "5") {
+      formInline.value.job = findById(formInline.value.job);
+    }
     await bussinessStaffPutService(formInline.value);
   } else {
-    console.log(formInline.value);
     await bussinessStaffPostService(formInline.value);
   }
   dialogVisible.value = false;
@@ -56,7 +53,7 @@ defineExpose({
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible">
+  <el-dialog v-model="dialogVisible" width="360">
     <div class="title">
       <h3>{{ tile }}</h3>
     </div>
@@ -71,8 +68,17 @@ defineExpose({
         <el-input v-model="formInline.name" placeholder="请输入姓名"></el-input>
       </el-form-item>
       <el-form-item label="用户名">
-        <el-input v-model="formInline.username" placeholder="请输入用户名">
-        </el-input
+        <el-input
+          v-if="tile === '新增商务人员信息'"
+          v-model="formInline.username"
+          placeholder="请输入用户名"
+        ></el-input>
+        <el-input
+          v-else
+          v-model="formInline.username"
+          placeholder="请输入用户名"
+          disabled
+        ></el-input
       ></el-form-item>
       <el-form-item label="密码">
         <el-input v-model="formInline.password" placeholder="请输入密码">
