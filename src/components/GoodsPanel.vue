@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineEmits, onMounted } from "vue";
+import { ref, defineEmits } from "vue";
 import { useGoodsDataStore } from "@/stores/goodsData";
 import {
   goodsPostService,
@@ -11,6 +11,7 @@ import { Plus } from "@element-plus/icons-vue";
 const { formInline } = useGoodsDataStore();
 const dialogVisible = ref(false);
 const tile = ref("");
+const ruleFormRef = ref();
 const goodsKind = ref([
   {
     id: "",
@@ -86,7 +87,7 @@ const rules = {
   code: [],
 };
 
-const open = async (row, title) => {
+const open = async (row, title: string) => {
   tile.value = title;
   formInline.id = "";
   formInline.name = "";
@@ -110,15 +111,18 @@ const open = async (row, title) => {
     formInline.goodsStatus = res.data.data.goodsStatus;
   }
   dialogVisible.value = true;
+  if (ruleFormRef.value) {
+    ruleFormRef.value.resetFields();
+  }
 };
- 
+
 defineExpose({
   open,
 });
 
 const emit = defineEmits(["success"]);
 
-const beforeAvatarUpload = (file) => {
+const beforeAvatarUpload = (file: File) => {
   const isJpgOrPng =
     file.name.endsWith(".jpg") ||
     file.name.endsWith(".jpeg") ||
@@ -219,7 +223,7 @@ const onSubmit = async () => {
       <el-form-item v-if="formInline.id === ''" label="货品编号" prop="code">
         <el-input
           v-model="formInline.code"
-          placeholder="请输入货品编号"
+          placeholder="编号示例:S-02-5534,2是种类编号,5534"
           clearable
         />
       </el-form-item>

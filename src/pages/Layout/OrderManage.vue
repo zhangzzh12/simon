@@ -51,7 +51,7 @@ interface orderItem {
   name: string;
   number: number;
   price: number;
-  goodsCode: string;
+  goodsCoecde: string;
 }
 
 const orderList = ref<order[]>([]);
