@@ -23,10 +23,10 @@ const { formInline, Warehouse } = useWareDataStore();
 const useWareData = useWareDataStore();
 const { title, warehouse } = useMenuStore();
 const num = ref(0);
-const number = ref(0);
 const billList = ref();
 const billlist = ref();
 const tableData = ref();
+const warehousePanel = ref();
 const load = ref(false);
 const total_bill = ref(0);
 const loading = ref(false);
@@ -226,15 +226,20 @@ const addGoods = () => {
   formInline.code = "";
   formInline.number = "";
   dialogVisible.value = true;
+  warehousePanel.value.clearForm();
 };
 //新增货品
 const onSubmit = async () => {
-  const res = await warehousePostService(formInline);
-  if (res.data.msg === "success") {
-    goodsGet();
-    dialogVisible.value = false;
+  if (Number(formInline.number) > 0) {
+    const res = await warehousePostService(formInline);
+    if (res.data.msg === "success") {
+      goodsGet();
+      dialogVisible.value = false;
+    } else {
+      alert(res.data.msg);
+    }
   } else {
-    alert(res.data.msg);
+    alert("新增货品的数量必须大于0");
   }
 };
 //入库操作
@@ -527,7 +532,7 @@ const warehouse_toggle = (id: number) => {
                 </OutwarehousePanel>
               </el-dialog>
               <el-dialog v-model="dialogVisible" width="320">
-                <WarehousePanel title="新增货品">
+                <WarehousePanel title="新增货品" ref="warehousePanel">
                   <template v-slot:button>
                     <div class="button-box">
                       <div class="button" @click="onSubmit">新增</div>

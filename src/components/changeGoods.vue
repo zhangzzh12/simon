@@ -4,8 +4,7 @@ import { ref } from "vue";
 const props = defineProps({
   title: String,
 });
-//表单校验
-const ruleFormRef = ref(); //获取表单dom
+const ruleFormRef = ref();
 const { formInline } = useWareDataStore();
 const rules = {
   number: [{ required: true, message: "请填写数量", trigger: "blur" }],
