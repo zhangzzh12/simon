@@ -58,6 +58,7 @@ const out = () => {
   token.removeToken();
   console.log(token.token);
   router.push("/login");
+  ElMessage.success('退出成功！');
 };
 </script>
 

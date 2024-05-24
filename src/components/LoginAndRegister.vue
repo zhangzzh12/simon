@@ -27,6 +27,7 @@ const sublim = async () => {
         if (res.data.code == 1) {
             token.token = res.data.data;         
             router.push('/');
+            ElMessage.success('登陆成功！');
         }else{
             ElMessage.error(res.data.msg);
         }
@@ -321,6 +322,7 @@ const closeVerify = (index: number) => {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    transition: height .18s ease;
 
     &.active {
         height: 570px;
