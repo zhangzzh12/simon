@@ -23,6 +23,7 @@ const { formInline, Warehouse } = useWareDataStore();
 const useWareData = useWareDataStore();
 const { title, warehouse } = useMenuStore();
 const num = ref(0);
+const number = ref(0);
 const billList = ref();
 const billlist = ref();
 const tableData = ref();
@@ -201,7 +202,8 @@ const goodsGet = async () => {
 };
 //获取仓库信息
 const countList = async () => {
-  const res = await warehouseCountGetService(search_date.value.warehouseNum);
+  console.log(warehouse.number);
+  const res = await warehouseCountGetService(warehouse.number);
   goodsCountList.value = res.data.data;
   for (let i = 0; i < goodsCountList.value.length; ++i) {
     mergedData.value[i].value = goodsCountList.value[i];
@@ -283,6 +285,7 @@ const outWarehouseOperation = async () => {
     outWarehouseVisible.value = false;
   }
 };
+//调拨货品
 const changeGoods = (row: any) => {
   formInline.id = row.id;
   formInline.name = row.name;
@@ -294,10 +297,14 @@ const changeGoods = (row: any) => {
   changeGoodsVisible.value = true;
 };
 const changeGoodsOperation = async () => {
-  await goodsChangeService(formInline);
-  goodsGet();
-  billGet();
-  changeGoodsVisible.value = false;
+  if (Number(formInline.number) > num.value) {
+    alert("出库数量不能超过库存数量！");
+  } else {
+    await goodsChangeService(formInline);
+    goodsGet();
+    billGet();
+    changeGoodsVisible.value = false;
+  }
 };
 //货品信息改变每页展示的数量
 const onSizeChange = (size: number) => {
