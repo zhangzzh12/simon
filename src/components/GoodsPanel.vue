@@ -8,7 +8,9 @@ import {
 } from "@/api/goods";
 import { imagePostService } from "@/api/upload";
 import { Plus } from "@element-plus/icons-vue";
-const { formInline } = useGoodsDataStore();
+import { storeToRefs } from "pinia";
+const { formInline } = storeToRefs(useGoodsDataStore());
+const { setFormInline } = useGoodsDataStore();
 const dialogVisible = ref(false);
 const tile = ref("");
 const ruleFormRef = ref();
@@ -87,28 +89,13 @@ const rules = {
   code: [],
 };
 
-const open = async (row, title: string) => {
+const open = async (row: any, title: string) => {
   tile.value = title;
-  formInline.id = "";
-  formInline.name = "";
-  formInline.outPrice = "";
-  formInline.inPrice = "";
-  formInline.image = "";
-  formInline.kind = "";
-  formInline.code = "";
-  formInline.packageSpe = "";
-  formInline.goodsStatus = "";
   if (tile.value === "编辑货品") {
     const res = await goodsChaService(row.id);
-    formInline.id = res.data.data.id;
-    formInline.name = res.data.data.name;
-    formInline.outPrice = res.data.data.outPrice;
-    formInline.inPrice = res.data.data.inPrice;
-    formInline.image = res.data.data.image;
-    formInline.kind = res.data.data.kind;
-    formInline.code = res.data.data.code;
-    formInline.packageSpe = res.data.data.packageSpe;
-    formInline.goodsStatus = res.data.data.goodsStatus;
+    formInline.value = { ...res.data.data };
+  } else {
+    setFormInline();
   }
   dialogVisible.value = true;
   if (ruleFormRef.value) {
@@ -143,14 +130,17 @@ const onSelectFile = async (uploadFile) => {
     const formData = new FormData();
     formData.append("image", uploadFile.raw);
     const res = await imagePostService(formData);
-    formInline.image = res.data.data;
+    formInline.value.image = res.data.data;
   }
 };
 const onSubmit = async () => {
-  if (formInline.id === "") {
-    await goodsPostService(formInline);
+  console.log(formInline.value);
+  if (formInline.value.id === "") {
+    console.log(formInline.value);
+    await goodsPostService(formInline.value);
   } else {
-    await goodsPutService(formInline);
+    console.log(formInline.value);
+    await goodsPutService(formInline.value);
   }
   dialogVisible.value = false;
   emit("success");

@@ -3,9 +3,19 @@ import { useMenuStore } from "@/stores/menuData";
 import { onMounted, ref, reactive } from "vue";
 import { customerGetService, customerDeleteService } from "@/api/customer";
 import CustomerPanel from "@/components/CustomerPanel.vue";
-const { title } = useMenuStore();
+const idList = ref([]);
+const tableData = ref([]);
 const customerRef = ref();
-// 查询量
+const loading = ref(false);
+const dialogVisible = ref(false);
+const { title } = useMenuStore();
+const total_page_number = ref(0);
+const tableTitle = [
+  { prop: "name", label: "客户姓名" },
+  { prop: "kind", label: "客户类别" },
+  { prop: "address", label: "地址" },
+  { prop: "phoneNum", label: "电话" },
+];
 const search_date = reactive({
   page: 1,
   pageSize: 10,
@@ -13,20 +23,8 @@ const search_date = reactive({
   kind: "",
   address: "",
 });
-const loading = ref(false);
-const total_page_number = ref(0);
-//删除列表数据
-const idList = ref([]);
-// 表格数据
-const tableData = ref([]);
-const tableTitle = [
-  { prop: "name", label: "客户姓名" },
-  { prop: "kind", label: "客户类别" },
-  { prop: "address", label: "地址" },
-  { prop: "phoneNum", label: "电话" },
-];
 //弹框
-const dialogVisible = ref(false);
+
 //获取客户信息列表
 const getCustomer = async () => {
   loading.value = true;

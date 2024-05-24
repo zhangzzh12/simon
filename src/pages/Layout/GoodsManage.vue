@@ -145,8 +145,7 @@ const rules = {
     { validator: maxValidator1, trigger: "blur" },
   ],
 };
-//批量删除的接口
-const selectionLineChangeHandle = (rows) => {
+const selectionLineChangeHandle = (rows: any) => {
   rows.forEach((row) => {
     const id = row.id;
     if (!idList.value.includes(id)) {
