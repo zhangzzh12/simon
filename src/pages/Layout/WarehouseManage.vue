@@ -2,6 +2,7 @@
 import { onMounted, ref } from "vue";
 import BarChart from "@/components/chart/BarChart.vue";
 import { useMenuStore } from "@/stores/menuData";
+import ChangeGoods from "@/components/changeGoods.vue";
 import {
   warehouseGetService,
   warehouseCountGetService,
@@ -11,6 +12,7 @@ import {
   outwarehousePostService,
   billGetService,
   warehouseListGetService,
+  goodsChangeService,
 } from "@/api/warehouse";
 import WarehousePanel from "@/components/WarehousePanel.vue";
 import OutwarehousePanel from "@/components/OutwarehousePanel.vue";
@@ -29,6 +31,14 @@ const total_bill = ref(0);
 const loading = ref(false);
 const goodsCountList = ref([]);
 const total_page_number = ref(0);
+//新增货品项显示与隐藏
+const dialogVisible = ref(false);
+//入库显示与隐藏
+const inWarehouseVisible = ref(false);
+//出库显示与隐藏
+const outWarehouseVisible = ref(false);
+//调拨货物显示与隐藏
+const changeGoodsVisible = ref(false);
 
 const getWarehouseList = async () => {
   const res = await warehouseListGetService();
@@ -205,17 +215,6 @@ const Query = () => {
 const queryBill = () => {
   billGet();
 };
-//新增货品
-const onSubmit = async () => {
-  console.log(formInline);
-  const res = await warehousePostService(formInline);
-  if (res.data.msg === "success") {
-    goodsGet();
-    dialogVisible.value = false;
-  } else {
-    alert(res.data.msg);
-  }
-};
 //添加货品
 const addGoods = () => {
   formInline.name = "";
@@ -225,6 +224,16 @@ const addGoods = () => {
   formInline.code = "";
   formInline.number = "";
   dialogVisible.value = true;
+};
+//新增货品
+const onSubmit = async () => {
+  const res = await warehousePostService(formInline);
+  if (res.data.msg === "success") {
+    goodsGet();
+    dialogVisible.value = false;
+  } else {
+    alert(res.data.msg);
+  }
 };
 //入库操作
 const inWarehouse = (row: any) => {
@@ -250,7 +259,6 @@ const inWarehouseOperation = async () => {
 };
 //出库操作
 const outWarehouse = (row: any) => {
-  console.log(row);
   formInline.id = row.id;
   formInline.name = row.name;
   formInline.inPrice = "";
@@ -270,10 +278,26 @@ const outWarehouseOperation = async () => {
   } else {
     await outwarehousePostService(formInline);
     search_bill.value.page = 1;
-    await billGet();
+    billGet();
     goodsGet();
     outWarehouseVisible.value = false;
   }
+};
+const changeGoods = (row: any) => {
+  formInline.id = row.id;
+  formInline.name = row.name;
+  formInline.inPrice = "";
+  formInline.kind = "";
+  formInline.location = warehouse.number;
+  formInline.code = row.code;
+  formInline.number = "";
+  changeGoodsVisible.value = true;
+};
+const changeGoodsOperation = async () => {
+  await goodsChangeService(formInline);
+  goodsGet();
+  billGet();
+  changeGoodsVisible.value = false;
 };
 //货品信息改变每页展示的数量
 const onSizeChange = (size: number) => {
@@ -297,6 +321,7 @@ const CurrentChange = (page: number) => {
   search_bill.value.page = page;
   billGet();
 };
+//撤销台账
 const revoke = async (row) => {
   await ElMessageBox.confirm("您确定要撤销该货品台账吗", "撤销货品台账", {
     type: "warning",
@@ -331,13 +356,6 @@ onMounted(() => {
   billGet();
   getWarehouseList();
 });
-
-//新增货品项显示与隐藏
-const dialogVisible = ref(false);
-//入库显示与隐藏
-const inWarehouseVisible = ref(false);
-//出库显示与隐藏
-const outWarehouseVisible = ref(false);
 
 const warehouse_toggle = (id: number) => {
   for (let i = 0; i < warehouse.active_list.length; ++i) {
@@ -453,7 +471,7 @@ const warehouse_toggle = (id: number) => {
                         link
                         type="primary"
                         size="small"
-                        @click.prevent=""
+                        @click.prevent="changeGoods(row)"
                         >调拨货品</el-button
                       >
                     </template>
@@ -501,7 +519,7 @@ const warehouse_toggle = (id: number) => {
                   </template>
                 </OutwarehousePanel>
               </el-dialog>
-              <el-dialog v-model="dialogVisible" width="380">
+              <el-dialog v-model="dialogVisible" width="320">
                 <WarehousePanel title="新增货品">
                   <template v-slot:button>
                     <div class="button-box">
@@ -512,6 +530,20 @@ const warehouse_toggle = (id: number) => {
                     </div>
                   </template>
                 </WarehousePanel>
+              </el-dialog>
+              <el-dialog v-model="changeGoodsVisible" width="320">
+                <ChangeGoods title="调拨货物">
+                  <template v-slot:button>
+                    <div class="button-box">
+                      <div class="button" @click="changeGoodsOperation">
+                        调拨
+                      </div>
+                      <div class="button" @click="changeGoodsVisible = false">
+                        取消
+                      </div>
+                    </div>
+                  </template>
+                </ChangeGoods>
               </el-dialog>
             </div>
             <div class="ledger-box">

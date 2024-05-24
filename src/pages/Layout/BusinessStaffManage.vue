@@ -30,7 +30,6 @@ const getbussinessStaff = async () => {
   const res = await bussinessStaffGetService(search_date);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
-  console.log(tableData.value);
   tableData.value.forEach((item) => {
     if (item.gender === 1) {
       item.gender = "男";

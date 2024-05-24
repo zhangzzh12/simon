@@ -1,10 +1,11 @@
 import request from "@/utils/request";
-
+import { useWareDataStore } from "@/stores/WarehouseData";
+const { formInline } = useWareDataStore();
 export const warehouseListGetService = () => {
   return request.get("/gethouseList");
 };
 
-export const warehouseGetService = (params) => { 
+export const warehouseGetService = (params) => {
   return request.get("/warehouse", { params });
 };
 export const warehouseCountGetService = (id: number) => {
@@ -29,4 +30,10 @@ export const billContionalGetService = (params) => {
 };
 export const billRevokeService = (data) => {
   return request.post("/cancel", data);
+};
+export const goodsChangeService = (data) => {
+  return request.post(
+    `/transport?nextLocation=${formInline.nextLocation}`,
+    data
+  );
 };

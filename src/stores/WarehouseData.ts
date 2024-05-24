@@ -18,6 +18,7 @@ export const useWareDataStore = defineStore("waredata", () => {
     code: "",
     inPrice: "",
     time: "",
+    nextLocation: "",
   });
   const Warehouse = reactive<{
     index: string;
