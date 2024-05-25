@@ -37,3 +37,6 @@ export const goodsChangeService = (data) => {
     data
   );
 };
+export const goodsGetService = () => {
+  return request.get("/goods/findAll");
+};

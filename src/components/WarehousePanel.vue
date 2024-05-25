@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { useWareDataStore } from "@/stores/WarehouseData";
 import { ref } from "vue";
+import { goodsGetService } from "@/api/warehouse";
 //货品种类
 const goodsKind = ref([
-  {
-    id: "",
-    name: "请选择",
-  },
   {
     id: 1,
     name: "日用品类",
@@ -64,13 +61,42 @@ const goodsKind = ref([
     name: "宠物用品类",
   },
 ]);
+const dataList = ref([]);
 const props = defineProps({
   title: String,
 });
-
+const rules = {
+  name: [{ required: true, message: "请选择货品名称", trigger: "blur" }],
+  number: [{ required: true, message: "请填写货品数量", trigger: "blur" }],
+  kind: [{ required: true, message: "请选择货品种类", trigger: "blur" }],
+  code: [{ required: true, message: "请选择货品编号", trigger: "blur" }],
+};
 //表单校验
 const ruleFormRef = ref(); //获取表单dom
 const { formInline } = useWareDataStore();
+const getGoods = async () => {
+  const res = await goodsGetService();
+  dataList.value = res.data.data;
+};
+const handleNameChange = () => {
+  const data = dataList.value.find((item) => item.name === formInline.name);
+  formInline.kind = data.kind;
+  formInline.code = data.code;
+};
+const selectChange = () => {
+  const data = dataList.value.find((item) => item.code === formInline.code);
+  formInline.kind = data.kind;
+  formInline.name = data.name;
+};
+const clearForm = () => {
+  if (ruleFormRef.value) {
+    ruleFormRef.value.resetFields();
+  }
+};
+defineExpose({
+  clearForm,
+});
+getGoods();
 </script>
 
 <template>
@@ -83,13 +109,23 @@ const { formInline } = useWareDataStore();
     label-position="right"
     label-width="auto"
     ref="ruleFormRef"
+    :rules="rules"
   >
     <el-form-item label="货品名称" prop="name">
-      <el-input
+      <el-select
         v-model="formInline.name"
-        placeholder="请输入货品名称"
-        clearable
-      />
+        placeholder="请选择货品名称"
+        @change="handleNameChange"
+      >
+        <el-option
+          v-for="data in dataList"
+          style="margin-left: 10px"
+          :value="data.name"
+          :key="data.id"
+          :label="data.name"
+        >
+        </el-option>
+      </el-select>
     </el-form-item>
     <el-form-item label="货品数量" prop="number">
       <el-input
@@ -111,11 +147,19 @@ const { formInline } = useWareDataStore();
       </el-select>
     </el-form-item>
     <el-form-item label="货品编号" prop="code">
-      <el-input
+      <el-select
         v-model="formInline.code"
-        placeholder="请输入货品的编号"
-        clearable
-      />
+        placeholder="请选择货品的编号"
+        @change="selectChange"
+      >
+        <el-option
+          v-for="data in dataList"
+          style="margin-left: 10px"
+          :value="data.code"
+          :key="data.id"
+          :label="data.code"
+        ></el-option>
+      </el-select>
     </el-form-item>
     <el-form-item class="button-box">
       <slot name="button"></slot>

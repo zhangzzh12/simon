@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useWareDataStore } from "@/stores/WarehouseData";
-import { ref, reactive } from "vue";
+import { ref } from "vue";
 const props = defineProps({
   title: String,
 });
-//表单校验
-const ruleFormRef = ref(); //获取表单dom
+const ruleFormRef = ref();
 const { formInline } = useWareDataStore();
+const rules = {
+  number: [{ required: true, message: "请填写数量", trigger: "blur" }],
+};
 </script>
 
 <template>
@@ -19,11 +21,12 @@ const { formInline } = useWareDataStore();
     label-position="right"
     label-width="auto"
     ref="ruleFormRef"
+    :rules="rules"
   >
     <el-form-item label="货品名称">
       <el-input v-model="formInline.name"> </el-input>
     </el-form-item>
-    <el-form-item label="货品数量">
+    <el-form-item label="货品数量" prop="number">
       <el-input v-model="formInline.number"> </el-input>
     </el-form-item>
     <el-form-item label="货品编号">

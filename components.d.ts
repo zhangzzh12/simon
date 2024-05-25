@@ -45,6 +45,7 @@ declare module 'vue' {
     PieChart: typeof import('./src/components/chart/PieChart.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SupplierPanel: typeof import('./src/components/SupplierPanel.vue')['default']
     WarehousePanel: typeof import('./src/components/WarehousePanel.vue')['default']
   }
   export interface ComponentCustomProperties {

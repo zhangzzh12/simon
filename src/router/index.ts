@@ -43,8 +43,8 @@ const router = createRouter({
           component: () => import("@/pages/Layout/BusinessStaffManage.vue"),
         },
         {
-          path: "f",
-          component: () => import("@/pages/Layout/F.vue"),
+          path: "SupplierManage",
+          component: () => import("@/pages/Layout/SupplierManage.vue"),
         },
       ],
     },
