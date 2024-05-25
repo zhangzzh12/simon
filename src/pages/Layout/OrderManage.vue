@@ -10,9 +10,11 @@ import {
 } from "@/api/order";
 import { useOrderDataStore } from "@/stores/orderData";
 import type { FormInstance } from "element-plus";
+import { tokenStore } from "@/stores/tokenData";
 
 const { title } = useMenuStore();
 const { formInline, dynamicValidateForm } = useOrderDataStore();
+const token = tokenStore();
 
 // 查询量
 const search_date = reactive({
@@ -113,8 +115,11 @@ const getorder = async () => {
 }; //获取所有数据
 
 onMounted(() => {
-  title.first = "销售单";
-  title.second = "收银";
+  title.first = "订单管理";
+  if (token.user.identity === 2)
+    title.second = "收银";
+  else if (token.user.identity === 1)
+    title.second = "审查";
   getorder();
 });
 
@@ -246,7 +251,7 @@ const check = async () => {
             </div>
             <div class="button" @click="search">查询</div>
           </form>
-          <section class="button-box">
+          <section class="button-box" v-show="token.user.identity === 2">
             <div class="button cash" @click="addorder">
               进行结账(新增销售单)
             </div>
@@ -265,15 +270,15 @@ const check = async () => {
           </section>
           <section class="button-box page">
             <div class="button" @click="prev">上一页</div>
-            <div class="button refund" @click="returnVisible = true">退货</div>
-            <div class="button refund" @click="checkVisible = true">审核</div>
+            <div class="button refund" @click="returnVisible = true" v-show="token.user.identity === 2">退货</div>
+            <div class="button refund" @click="checkVisible = true" v-show="token.user.identity === 1">审核</div>
             <div class="button" @click="next">下一页</div>
             <div class="wrapper">
               <span>当前页面：</span><input class="page-index" type="number" @blur="jumpTo" v-model="page_index" />
               <div class="total-data">共有{{ total_page_number }}单</div>
             </div>
           </section>
-          <el-dialog v-model="dialogVisible" width="600" draggable >
+          <el-dialog v-model="dialogVisible" width="600" draggable>
             <OrderPanel title="销售单结账进行中" @getvisible="emitsGetvisible" />
           </el-dialog>
           <el-dialog v-model="returnVisible" width="350">
@@ -532,7 +537,7 @@ const check = async () => {
             .total-data {
               margin-right: 15px;
               font-size: 16px;
-              
+
               span {
                 @include font_color("text-100");
               }

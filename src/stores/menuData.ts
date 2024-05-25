@@ -1,6 +1,13 @@
 import { reactive, ref } from "vue";
 import { defineStore } from "pinia";
 
+interface menuItem {
+  title: string;
+  url: string;
+  icon: string;
+  key: number;
+}
+
 export const useMenuStore = defineStore(
   "menu",
   () => {
@@ -17,10 +24,13 @@ export const useMenuStore = defineStore(
       name: "店铺",
     });
 
+    const aside_list = ref<menuItem[]>([]);
+
     return {
       title,
       asideList_id,
       warehouse,
+      aside_list,
     };
   },
   {
