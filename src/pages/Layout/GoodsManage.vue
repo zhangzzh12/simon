@@ -205,6 +205,7 @@ const delAllClick = async () => {
     });
     await goodsDeleteService(idList.value);
     getGoods();
+    idList.value = [];
   }
 };
 const Query = () => {

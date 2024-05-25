@@ -30,6 +30,13 @@ const findById = (job: any) => {
   const kind = jobList.value.find((item) => item.id === job);
   return kind ? kind.id : "";
 };
+const rules = {
+  name: [{ required: true, message: "请填写商务人员姓名", trigger: "blur" }],
+  username: [{ required: true, message: "请填写用户名", trigger: "blur" }],
+  password: [{ required: true, message: "请填写密码", trigger: "blur" }],
+  gender: [{ required: true, message: "请选择性别", trigger: "blur" }],
+  job: [{ required: true, message: "请选择工作", trigger: "blur" }],
+};
 const Submit = async () => {
   if (formInline.value.gender === "男") {
     formInline.value.gender = "1";
@@ -63,11 +70,12 @@ defineExpose({
       label-width="auto"
       ref="ruleFormRef"
       :model="formInline"
+      :rules="rules"
     >
-      <el-form-item label="姓名">
+      <el-form-item label="姓名" prop="name">
         <el-input v-model="formInline.name" placeholder="请输入姓名"></el-input>
       </el-form-item>
-      <el-form-item label="用户名">
+      <el-form-item label="用户名" prop="username">
         <el-input
           v-if="tile === '新增商务人员信息'"
           v-model="formInline.username"
@@ -80,17 +88,17 @@ defineExpose({
           disabled
         ></el-input
       ></el-form-item>
-      <el-form-item label="密码">
+      <el-form-item label="密码" prop="password">
         <el-input v-model="formInline.password" placeholder="请输入密码">
         </el-input>
       </el-form-item>
-      <el-form-item label="性别" v-model="formInline.gender">
+      <el-form-item label="性别" v-model="formInline.gender" prop="gender">
         <el-select v-model="formInline.gender" placeholder="请选择性别">
           <el-option label="男" value="1" style="margin-left: 7px" />
           <el-option label="女" value="2" style="margin-left: 7px" />
         </el-select>
       </el-form-item>
-      <el-form-item label="职位">
+      <el-form-item label="职位" prop="job">
         <el-select
           v-model="formInline.job"
           placeholder="请选择职位"

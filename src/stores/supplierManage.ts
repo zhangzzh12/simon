@@ -6,13 +6,22 @@ export const useGoodsDataStore = defineStore(
     const formInline = ref({
       id: "",
       name: "",
-      username: "",
-      password: "",
-      gender: "",
-      job: "",
+      address: "",
+      kind: "",
+      phoneNum: "",
     });
+    const setformInline = () => {
+      formInline.value = {
+        id: "",
+        name: "",
+        address: "",
+        kind: "",
+        phoneNum: "",
+      };
+    };
     return {
       formInline,
+      setformInline,
     };
   },
   {

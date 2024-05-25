@@ -94,6 +94,7 @@ const deleteAllClick = async () => {
     );
     await bussinessStaffDeleteService(idList.value);
     getbussinessStaff();
+    idList.value = [];
   }
 };
 const onSuccess = () => {

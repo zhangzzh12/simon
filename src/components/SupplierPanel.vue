@@ -1,22 +1,70 @@
 <script setup lang="ts">
 import { ref, defineEmits } from "vue";
-import { useGoodsDataStore } from "@/stores/bussinessStaff.ts";
+import { useGoodsDataStore } from "@/stores/supplierManage.ts";
 import { storeToRefs } from "pinia";
-import {
-  bussinessStaffPostService,
-  bussinessStaffPutService,
-} from "@/api/bussinessStaff";
+import { supplierPostService, supplierPutService } from "@/api/supplier.ts";
 const { formInline } = storeToRefs(useGoodsDataStore());
 const tile = ref("");
 const ruleFormRef = ref();
 const dialogVisible = ref(false);
 const emit = defineEmits(["success"]);
-const jobList = ref([
-  { id: "1", name: "店长" },
-  { id: "2", name: "收银员" },
-  { id: "3", name: "仓库管理员" },
-  { id: "4", name: "售货员" },
-  { id: "5", name: "采购人员" },
+const supplierKind = ref([
+  {
+    id: "1",
+    name: "日用品类",
+  },
+  {
+    id: "2",
+    name: "食品类",
+  },
+  {
+    id: "3",
+    name: "服装鞋帽类",
+  },
+  {
+    id: "4",
+    name: "饮料类",
+  },
+  {
+    id: "5",
+    name: "烟草类",
+  },
+  {
+    id: "6",
+    name: "药品类",
+  },
+  {
+    id: "7",
+    name: "电子产品类",
+  },
+  {
+    id: "8",
+    name: "家用电器类",
+  },
+  {
+    id: "9",
+    name: "家居用品类",
+  },
+  {
+    id: "10",
+    name: "书籍文具类",
+  },
+  {
+    id: "11",
+    name: "化妆品类",
+  },
+  {
+    id: "12",
+    name: "运动户外用品类",
+  },
+  {
+    id: "13",
+    name: "汽车配件类",
+  },
+  {
+    id: "14",
+    name: "宠物用品类",
+  },
 ]);
 const open = (row: any, title: string) => {
   tile.value = title;
@@ -26,23 +74,25 @@ const open = (row: any, title: string) => {
     ruleFormRef.value.resetFields();
   }
 };
-const findById = (job: any) => {
-  const kind = jobList.value.find((item) => item.id === job);
+const rules = {
+  name: [{ required: true, message: "请填写供货商名称", trigger: "blur" }],
+  address: [{ required: true, message: "请填写供货商地址", trigger: "blur" }],
+  kind: [{ required: true, message: "请选择供货商种类", trigger: "blur" }],
+  phoneNum: [
+    { required: true, message: "请填写供货商电话号码", trigger: "blur" },
+    { pattern: /^\d{11}$/, message: "电话号码必须是11位数字", trigger: "blur" },
+  ],
+};
+const findByName = (name) => {
+  const kind = supplierKind.value.find((item) => item.name === name);
   return kind ? kind.id : "";
 };
 const Submit = async () => {
-  if (formInline.value.gender === "男") {
-    formInline.value.gender = "1";
-  } else if (formInline.value.gender === "女") {
-    formInline.value.gender = "2";
-  }
+  formInline.value.kind = findByName(formInline.value.kind);
   if (formInline.value.id) {
-    if (formInline.value.job !== "1" || "2" || "3" || "4" || "5") {
-      formInline.value.job = findById(formInline.value.job);
-    }
-    await bussinessStaffPutService(formInline.value);
+    await supplierPutService(formInline.value);
   } else {
-    await bussinessStaffPostService(formInline.value);
+    await supplierPostService(formInline.value);
   }
   dialogVisible.value = false;
   emit("success");
@@ -63,49 +113,37 @@ defineExpose({
       label-width="auto"
       ref="ruleFormRef"
       :model="formInline"
+      :rules="rules"
     >
-      <el-form-item label="姓名">
-        <el-input v-model="formInline.name" placeholder="请输入姓名"></el-input>
-      </el-form-item>
-      <el-form-item label="用户名">
+      <el-form-item label="姓名" prop="name">
         <el-input
-          v-if="tile === '新增商务人员信息'"
-          v-model="formInline.username"
-          placeholder="请输入用户名"
+          v-model="formInline.name"
+          placeholder="请输入供货商姓名"
         ></el-input>
-        <el-input
-          v-else
-          v-model="formInline.username"
-          placeholder="请输入用户名"
-          disabled
-        ></el-input
-      ></el-form-item>
-      <el-form-item label="密码">
-        <el-input v-model="formInline.password" placeholder="请输入密码">
-        </el-input>
       </el-form-item>
-      <el-form-item label="性别" v-model="formInline.gender">
-        <el-select v-model="formInline.gender" placeholder="请选择性别">
-          <el-option label="男" value="1" style="margin-left: 7px" />
-          <el-option label="女" value="2" style="margin-left: 7px" />
+      <el-form-item label="地址" prop="address">
+        <el-input
+          v-model="formInline.address"
+          placeholder="请输入供货商地址"
+        ></el-input>
+      </el-form-item>
+      <el-form-item label="种类" prop="kind">
+        <el-select v-model="formInline.kind" placeholder="请选择供货商种类">
+          <el-option
+            v-for="goods in supplierKind"
+            style="margin-left: 10px"
+            :value="goods.name"
+            :key="goods.id"
+            :label="goods.name"
+          ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="职位">
-        <el-select
-          v-model="formInline.job"
-          placeholder="请选择职位"
-          style="width: 120px"
-        >
-          <el-option label="店长" value="1" style="margin-left: 7px" />
-          <el-option label="收银员" value="2" style="margin-left: 7px" />
-          <el-option label="仓库管理员" value="3" style="margin-left: 7px" />
-          <el-option label="售货员" value="4" style="margin-left: 7px" />
-          <el-option
-            label="采购人员"
-            value="5"
-            style="margin-left: 7px"
-          /> </el-select
-      ></el-form-item>
+      <el-form-item label="电话号码" prop="phoneNum">
+        <el-input
+          v-model="formInline.phoneNum"
+          placeholder="请输入供货商电话号码"
+        ></el-input>
+      </el-form-item>
       <div
         style="display: flex; justify-content: space-between; margin-top: 30px"
       >

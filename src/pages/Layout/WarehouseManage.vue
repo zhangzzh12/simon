@@ -260,6 +260,7 @@ const inWarehouseOperation = async () => {
     search_bill.value.page = 1;
     await billGet();
     goodsGet();
+    countList();
     inWarehouseVisible.value = false;
   }
 };
@@ -286,6 +287,7 @@ const outWarehouseOperation = async () => {
     search_bill.value.page = 1;
     billGet();
     goodsGet();
+    countList();
     outWarehouseVisible.value = false;
   }
 };
@@ -307,6 +309,7 @@ const changeGoodsOperation = async () => {
     await goodsChangeService(formInline);
     goodsGet();
     billGet();
+    countList();
     changeGoodsVisible.value = false;
   }
 };

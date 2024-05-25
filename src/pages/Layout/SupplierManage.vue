@@ -1,14 +1,76 @@
 <script setup lang="ts">
 import { useMenuStore } from "@/stores/menuData";
 import { onMounted, ref, reactive } from "vue";
-import SupplierPanel from "@/pages/Layout/SupplierManage.vue";
 import { supplierGetService, supplierDeleteService } from "@/api/supplier.ts";
+import SupplierPanel from "@/components/SupplierPanel.vue";
 const idList = ref([]);
 const tableData = ref([]);
 const loading = ref(false);
 const supplierPanel = ref();
 const total_page_number = ref(0);
 const { title } = useMenuStore();
+const supplierKind = ref([
+  {
+    id: "",
+    name: "请选择",
+  },
+  {
+    id: 1,
+    name: "日用品类",
+  },
+  {
+    id: 2,
+    name: "食品类",
+  },
+  {
+    id: 3,
+    name: "服装鞋帽类",
+  },
+  {
+    id: 4,
+    name: "饮料类",
+  },
+  {
+    id: 5,
+    name: "烟草类",
+  },
+  {
+    id: 6,
+    name: "药品类",
+  },
+  {
+    id: 7,
+    name: "电子产品类",
+  },
+  {
+    id: 8,
+    name: "家用电器类",
+  },
+  {
+    id: 9,
+    name: "家居用品类",
+  },
+  {
+    id: 10,
+    name: "书籍文具类",
+  },
+  {
+    id: 11,
+    name: "化妆品类",
+  },
+  {
+    id: 12,
+    name: "运动户外用品类",
+  },
+  {
+    id: 13,
+    name: "汽车配件类",
+  },
+  {
+    id: 14,
+    name: "宠物用品类",
+  },
+]);
 const search_date = reactive({
   page: 1,
   pageSize: 10,
@@ -19,11 +81,20 @@ const tableTitle = [
   { prop: "name", label: "姓名" },
   { prop: "kind", label: "类别" },
   { prop: "address", label: "地址" },
+  { prop: "phoneNum", label: "电话号码" },
 ];
+const findById = (id) => {
+  const kind = supplierKind.value.find((item) => item.id === id);
+  return kind ? kind.name : "";
+};
 const getSupplier = async () => {
   loading.value = true;
   const res = await supplierGetService(search_date);
-  console.log(res);
+  total_page_number.value = res.data.data.total;
+  tableData.value = res.data.data.rows;
+  tableData.value.forEach((item) => {
+    item.kind = findById(item.kind);
+  });
   loading.value = false;
 };
 const onSizeChange = (size: number) => {
@@ -48,15 +119,15 @@ const selectionLineChangeHandle = (rows: any) => {
 };
 //新增商务人员信息
 const addClick = (row: any) => {
-  supplierPanel.value.open(row, "新增商务人员信息");
+  supplierPanel.value.open(row, "新增供货商信息");
 };
 //编辑商务人员信息
 const editClick = (row: any) => {
-  supplierPanel.value.open(row, "编辑商务人员信息");
+  supplierPanel.value.open(row, "编辑供货商信息");
 };
 //删除
 const Delete = async (row: any) => {
-  await ElMessageBox.confirm("您确定要删除商务人员信息吗", "删除商务人员信息", {
+  await ElMessageBox.confirm("您确定要删除供货商信息吗", "删除供货商信息", {
     type: "warning",
     confirmButtonText: "确定",
     cancelButtonText: "取消",
@@ -67,19 +138,16 @@ const Delete = async (row: any) => {
 //批量删除
 const deleteAllClick = async () => {
   if (idList.value.length === 0) {
-    ElMessage.warning("请选择要删除的商务人员");
+    ElMessage.warning("请选择要删除的供货商");
   } else {
-    await ElMessageBox.confirm(
-      "您确定要删除商务人员信息吗",
-      "删除商务人员信息",
-      {
-        type: "warning",
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-      }
-    );
+    await ElMessageBox.confirm("您确定要删除供货商信息吗", "删除商务人员信息", {
+      type: "warning",
+      confirmButtonText: "确定",
+      cancelButtonText: "取消",
+    });
     await supplierDeleteService(idList.value);
     getSupplier();
+    idList.value = [];
   }
 };
 const onSuccess = () => {
@@ -102,26 +170,34 @@ onMounted(() => {
               <span>供货商名称</span>
               <el-input
                 v-model="search_date.name"
-                placeholder="请输入商务人员姓名"
+                placeholder="请输入供货商名称"
                 style="width: 150px"
                 clearable
               />
             </div>
             <div class="input-box">
-              <span>职位</span>
+              <span>种类</span>
               <el-select
                 v-model="search_date.kind"
                 placeholder="请选择"
                 style="width: 120px"
               >
-                <el-option label="收银员" value="2" style="margin-left: 7px" />
+                <el-option
+                  v-for="goods in supplierKind"
+                  style="margin-left: 10px"
+                  :value="goods.id"
+                  :key="goods.id"
+                  :label="goods.name"
+                ></el-option>
               </el-select>
             </div>
             <div class="button" @click="Query">查询</div>
           </form>
           <section class="button-box">
-            <div class="button" @click="addClick">+ 新增商务人员</div>
-            <div class="button" @click="deleteAllClick">- 批量删除商务人员</div>
+            <div class="button" @click="addClick">+ 新增供货商信息</div>
+            <div class="button" @click="deleteAllClick">
+              - 批量删除供货商信息
+            </div>
           </section>
           <section class="order-box">
             <el-table

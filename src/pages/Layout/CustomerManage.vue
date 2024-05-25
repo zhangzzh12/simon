@@ -95,6 +95,7 @@ const deleteAllClick = async () => {
     });
     await customerDeleteService(idList.value);
     getCustomer();
+    idList.value = [];
   }
 };
 onMounted(() => {
