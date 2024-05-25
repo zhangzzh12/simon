@@ -124,20 +124,20 @@ const goodsKind = ref([
   },
 ]);
 const mergedData = ref([
-  { name: "日用品类", value: "0" },
-  { name: "食品类", value: "0" },
-  { name: "服装鞋帽类", value: "0" },
-  { name: "饮料类", value: "0" },
-  { name: "烟草类", value: "0" },
-  { name: "药品类", value: "0" },
-  { name: "电子产品类", value: "0" },
-  { name: "家用电器类", value: "0" },
-  { name: "家居用品类", value: "0" },
-  { name: "书籍文具类", value: "0" },
-  { name: "化妆品类", value: "0" },
-  { name: "运动户外用品类", value: "0" },
-  { name: "汽车配件类", value: "0" },
-  { name: "宠物用品类", value: "0" },
+  { name: "日用品类", value: 0 },
+  { name: "食品类", value: 0 },
+  { name: "服装鞋帽类", value: 0 },
+  { name: "饮料类", value: 0 },
+  { name: "烟草类", value: 0 },
+  { name: "药品类", value: 0 },
+  { name: "电子产品类", value: 0 },
+  { name: "家用电器类", value: 0 },
+  { name: "家居用品类", value: 0 },
+  { name: "书籍文具类", value: 0 },
+  { name: "化妆品类", value: 0 },
+  { name: "运动户外用品类", value: 0 },
+  { name: "汽车配件类", value: 0 },
+  { name: "宠物用品类", value: 0 },
 ]);
 const search_date = ref({
   page: 1,
@@ -202,7 +202,6 @@ const goodsGet = async () => {
 };
 //获取仓库信息
 const countList = async () => {
-  console.log(warehouse.number);
   const res = await warehouseCountGetService(warehouse.number);
   goodsCountList.value = res.data.data;
   for (let i = 0; i < goodsCountList.value.length; ++i) {

@@ -22,7 +22,7 @@ let aside_list = reactive([
     id: 7,
     icon: "bxs-backpack",
     title: "供货商管理",
-    url: "/f",
+    url: "/SupplierManage",
   },
 ]);
 
@@ -58,7 +58,7 @@ const out = () => {
   token.removeToken();
   console.log(token.token);
   router.push("/login");
-  ElMessage.success('退出成功！');
+  ElMessage.success("退出成功！");
 };
 </script>
 
