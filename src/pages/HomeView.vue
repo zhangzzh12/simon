@@ -70,7 +70,9 @@ const { title } = useMenuStore();
         </el-header>
         <el-main>
           <transition name="fade" mode="out-in">
-            <RouterView />
+            <KeepAlive>
+              <RouterView />
+            </KeepAlive>
           </transition>
         </el-main>
       </el-container>

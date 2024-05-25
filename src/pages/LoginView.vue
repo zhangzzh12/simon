@@ -25,7 +25,7 @@ let nav_menu_list = [
 ];
 
 
-const { title,asideList_id } = useMenuStore();
+const { title, asideList_id } = useMenuStore();
 
 onMounted(() => {
     title.first = '首页';
@@ -33,7 +33,7 @@ onMounted(() => {
     for (let i = 0; i < asideList_id.length; ++i) {
         asideList_id[i] = '';
     }
-    asideList_id[1]='active';
+    asideList_id[1] = 'active';
 });
 
 </script>
@@ -65,7 +65,9 @@ onMounted(() => {
             </section>
             <section class="form-Area">
                 <transition name="fade" mode="out-in">
-                    <RouterView />
+                    <KeepAlive>
+                        <RouterView />
+                    </KeepAlive>
                 </transition>
             </section>
         </main>

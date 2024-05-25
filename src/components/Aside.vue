@@ -12,18 +12,8 @@ let aside_list = reactive([
   { id: 3, icon: "bx-lemon", title: "货品管理", url: "/goodsManage" },
   { id: 4, icon: "bx-cart-alt", title: "订单管理", url: "/orderManage" },
   { id: 5, icon: "bx-user", title: "客户管理", url: "/customerManage" },
-  {
-    id: 6,
-    icon: "bx-credit-card",
-    title: "商务人员管理",
-    url: "/businessStaffManage",
-  },
-  {
-    id: 7,
-    icon: "bxs-backpack",
-    title: "供货商管理",
-    url: "/SupplierManage",
-  },
+  { id: 6, icon: "bx-credit-card", title: "商务人员管理", url: "/businessStaffManage" },
+  { id: 7, icon: "bxs-backpack", title: "供货商管理", url: "/SupplierManage" },
 ]);
 
 let isactive = ref("");
@@ -56,6 +46,7 @@ let li_click = (id: number) => {
 const token = tokenStore();
 const out = () => {
   token.removeToken();
+  token.removeUser();
   console.log(token.token);
   router.push("/login");
   ElMessage.success("退出成功！");
@@ -79,12 +70,7 @@ const out = () => {
           <input type="text" placeholder="Search" />
         </a>
       </li>
-      <li
-        v-for="value in aside_list"
-        :key="value.id"
-        :class="asideList_id[value.id]"
-        @click="li_click(value.id)"
-      >
+      <li v-for="value in aside_list" :key="value.id" :class="asideList_id[value.id]" @click="li_click(value.id)">
         <RouterLink :to="value.url">
           <i class="bx" :class="value.icon"></i>
           <span class="links-name">{{ value.title }}</span>
