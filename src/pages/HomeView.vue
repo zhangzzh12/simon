@@ -1,11 +1,15 @@
 <script setup lang="ts">
+import { getPermission } from '@/api/login';
 import Aside from '@/components/Aside.vue';
 import { useThemeStyleStore } from '@/stores/Themedata';
 import { useMenuStore } from '@/stores/menuData';
-import { ref, reactive } from 'vue';
+import { tokenStore } from '@/stores/tokenData';
+import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 
-
+const token = tokenStore();
+const job = ['店长', '收银员', '仓库管理员', '售货员', '采购人员'];
+// 1-店长，2-收银员，3-仓库管理员，4-售货员，5-采购人员
 // 主题色切换
 const { themeStyle } = useThemeStyleStore();
 
@@ -36,11 +40,13 @@ const nav_goTo = (id: string | number) => {
 
 //面包屑
 const { title } = useMenuStore();
+
+const loading = ref(false);
 </script>
 
 <template>
   <div class="home-main">
-    <el-container class="home-container">
+    <el-container class="home-container" :v-loading="loading">
       <div class="aside" style="z-index: 1024;">
         <Aside />
       </div>
@@ -65,7 +71,7 @@ const { title } = useMenuStore();
           </ul>
           <div class="homepage-box">
             <div class="user-img"></div>
-            <div class="personal-name"><span>你好!Simon<br />店员</span></div>
+            <div class="personal-name"><span>你好!{{ token.user.username }}<br />职位：{{ job[token.user.identity-1] }}</span></div>
           </div>
         </el-header>
         <el-main>

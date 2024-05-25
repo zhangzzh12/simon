@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import { tokenStore } from '@/stores/tokenData.ts';
-import { postLogin } from '@/api/login';
+import { getPermission, postLogin } from '@/api/login';
 import { useRouter } from 'vue-router';
-import { ElMessage } from 'element-plus';
+import { useMenuStore } from '@/stores/menuData';
+const Menu = useMenuStore()
 
 const router = useRouter();
 const user = reactive({
@@ -25,7 +26,14 @@ const sublim = async () => {
     if (value === num) {
         const res = await postLogin(user);
         if (res.data.code == 1) {
-            token.token = res.data.data;         
+            token.token = res.data.data.jwt;        
+            token.user.username = res.data.data.username;
+            token.user.identity = res.data.data.job;
+            const menu = await getPermission(token.user.identity);
+            Menu.aside_list = [];
+            for(let i=0;i<menu.data.data.length;++i){
+                Menu.aside_list.push(menu.data.data[i]);
+            }
             router.push('/');
             ElMessage.success('登陆成功！');
         }else{
