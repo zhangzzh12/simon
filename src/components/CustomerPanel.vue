@@ -21,6 +21,7 @@ const open = (row, title: string) => {
   }
 };
 const onSubmit = async () => {
+  await ruleFormRef.value.validate();
   if (customer.value.kind === "零售客户") {
     customer.value.kind = "1";
   } else if (customer.value.kind === "批发客户") {

@@ -16,10 +16,6 @@ const tile = ref("");
 const ruleFormRef = ref();
 const goodsKind = ref([
   {
-    id: "",
-    name: "请选择",
-  },
-  {
     id: 1,
     name: "日用品类",
   },
@@ -84,9 +80,35 @@ const validatePrice = (rule, value, callback) => {
   }
 };
 const rules = {
-  outPrice: [{ validator: validatePrice, trigger: "blur" }],
-  inPrice: [{ validator: validatePrice, trigger: "blur" }],
-  code: [],
+  name: [{ required: true, message: "请填写货品名称", trigger: "blur" }],
+  inPrice: [
+    { required: true, message: "请填写货品进价", trigger: "blur" },
+    { validator: validatePrice, trigger: "blur" },
+  ],
+  outPrice: [
+    { required: true, message: "请填写货品售价", trigger: "blur" },
+    { validator: validatePrice, trigger: "blur" },
+  ],
+  image: [{ required: true, message: "请选择需要上传的图片", trigger: "blur" }],
+  kind: [{ required: true, message: "请选择需要货品的种类", trigger: "blur" }],
+  code: [
+    { required: true, message: "请填写货品的编号", trigger: "blur" },
+    {
+      validator: (rule, value, callback) => {
+        const reg = /^S-(0[1-9]|1[0-4])-[\d]{4}$/;
+        if (!reg.test(value)) {
+          callback(new Error("货品编号格式不正确"));
+        } else {
+          callback();
+        }
+      },
+      trigger: "blur",
+    },
+  ],
+  packageSpe: [
+    { required: true, message: "请填写货品包装规格", trigger: "blur" },
+  ],
+  goodsStatus: [{ required: true, message: "请填写货品状态", trigger: "blur" }],
 };
 
 const open = async (row: any, title: string) => {
@@ -134,7 +156,7 @@ const onSelectFile = async (uploadFile) => {
   }
 };
 const onSubmit = async () => {
-  console.log(formInline.value);
+  await ruleFormRef.value.validate();
   if (formInline.value.id === "") {
     console.log(formInline.value);
     await goodsPostService(formInline.value);
@@ -148,7 +170,7 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" width="480">
+  <el-dialog v-model="dialogVisible" width="545">
     <div class="title">
       <h3>{{ tile }}</h3>
     </div>
@@ -160,7 +182,7 @@ const onSubmit = async () => {
       ref="ruleFormRef"
       :rules="rules"
     >
-      <el-form-item label="货品名称">
+      <el-form-item label="货品名称" prop="name">
         <el-input
           v-model="formInline.name"
           placeholder="请输入货品名称"
@@ -182,7 +204,7 @@ const onSubmit = async () => {
         />
       </el-form-item>
 
-      <el-form-item label="货品图片">
+      <el-form-item label="货品图片" prop="image">
         <el-upload
           class="avatar-uploader"
           :show-file-list="false"
@@ -197,7 +219,7 @@ const onSubmit = async () => {
         </el-upload>
       </el-form-item>
 
-      <el-form-item label="货品种类" v-if="formInline.id === ''">
+      <el-form-item label="货品种类" v-if="formInline.id === ''" prop="kind">
         <el-select placeholder="请选择货品的种类" v-model="formInline.kind">
           <el-option
             v-for="goods in goodsKind"
@@ -213,12 +235,12 @@ const onSubmit = async () => {
       <el-form-item v-if="formInline.id === ''" label="货品编号" prop="code">
         <el-input
           v-model="formInline.code"
-          placeholder="编号示例:S-02-5534,2是种类编号,5534"
+          placeholder="编号示例:S-02-5534,02是种类编号(从01-14),后四位数字任意"
           clearable
         />
       </el-form-item>
 
-      <el-form-item label="货品包装规格">
+      <el-form-item label="货品包装规格" prop="packageSpe">
         <el-input
           v-model="formInline.packageSpe"
           placeholder="请输入货品包装规格"
@@ -226,7 +248,7 @@ const onSubmit = async () => {
         />
       </el-form-item>
 
-      <el-form-item label="货品状态">
+      <el-form-item label="货品状态" prop="goodsStatus">
         <el-input
           v-model="formInline.goodsStatus"
           placeholder="请输入货品状态"

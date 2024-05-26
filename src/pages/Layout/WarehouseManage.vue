@@ -229,6 +229,7 @@ const addGoods = () => {
 };
 //新增货品
 const onSubmit = async () => {
+  await warehousePanel.ruleFormRef.validate();
   if (Number(formInline.number) > 0) {
     const res = await warehousePostService(formInline);
     if (res.data.msg === "success") {
@@ -293,6 +294,7 @@ const outWarehouseOperation = async () => {
 };
 //调拨货品
 const changeGoods = (row: any) => {
+  num.value = row.number;
   formInline.id = row.id;
   formInline.name = row.name;
   formInline.inPrice = "";
@@ -300,6 +302,7 @@ const changeGoods = (row: any) => {
   formInline.location = warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
+  formInline.nextLocation = "";
   changeGoodsVisible.value = true;
 };
 const changeGoodsOperation = async () => {
@@ -394,8 +397,12 @@ const warehouse_toggle = (id: number) => {
                   <div class="box">
                     <div class="warehouse-list">
                       <h3>店铺/仓库列表</h3>
-                      <div class="warehouse-btn" v-for="(item, index) in Warehouse.WarehouseList"
-                        @click="warehouse_toggle(index)" :class="warehouse.active_list[index]">
+                      <div
+                        class="warehouse-btn"
+                        v-for="(item, index) in Warehouse.WarehouseList"
+                        @click="warehouse_toggle(index)"
+                        :class="warehouse.active_list[index]"
+                      >
                         {{ item.name }}
                       </div>
                     </div>
@@ -405,7 +412,11 @@ const warehouse_toggle = (id: number) => {
               <el-col :span="20">
                 <div class="grid-content">
                   <div class="box">
-                    <BarChart chartTitle="仓位速览" :xAxis="goodsName" :chartData="mergedData" />
+                    <BarChart
+                      chartTitle="仓位速览"
+                      :xAxis="goodsName"
+                      :chartData="mergedData"
+                    />
                   </div>
                 </div>
               </el-col>
@@ -416,13 +427,27 @@ const warehouse_toggle = (id: number) => {
               <form class="input-form">
                 <div class="input-box">
                   <span>货品名称</span>
-                  <el-input v-model="search_date.name" placeholder="请输入货品名称" style="width: 150px" clearable />
+                  <el-input
+                    v-model="search_date.name"
+                    placeholder="请输入货品名称"
+                    style="width: 150px"
+                    clearable
+                  />
                 </div>
                 <div class="input-box">
                   <span>种类</span>
-                  <el-select v-model="search_date.kind" placeholder="请选择" style="width: 100px">
-                    <el-option v-for="goods in goodsKind" style="margin-left: 10px" :value="goods.id" :key="goods.id"
-                      :label="goods.name">
+                  <el-select
+                    v-model="search_date.kind"
+                    placeholder="请选择"
+                    style="width: 100px"
+                  >
+                    <el-option
+                      v-for="goods in goodsKind"
+                      style="margin-left: 10px"
+                      :value="goods.id"
+                      :key="goods.id"
+                      :label="goods.name"
+                    >
                     </el-option>
                   </el-select>
                 </div>
@@ -432,21 +457,55 @@ const warehouse_toggle = (id: number) => {
                 <div class="button" @click="addGoods">+ 新增货品</div>
               </section>
               <section class="table-box">
-                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
-                  <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label" align="center" />
+                <el-table
+                  ref="multipleTableRef"
+                  :data="tableData"
+                  table-layout="auto"
+                  v-loading="loading"
+                >
+                  <el-table-column
+                    v-for="item in tableTitle"
+                    :prop="item.props"
+                    :label="item.label"
+                    align="center"
+                  />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button type="primary" size="small" @click.prevent="inWarehouse(row)">入库</el-button>
-                      <el-button link type="primary" size="small" @click.prevent="outWarehouse(row)">出库</el-button>
-                      <el-button link type="primary" size="small" @click.prevent="changeGoods(row)">调拨货品</el-button>
+                      <el-button
+                        type="primary"
+                        size="small"
+                        @click.prevent="inWarehouse(row)"
+                        >入库</el-button
+                      >
+                      <el-button
+                        link
+                        type="primary"
+                        size="small"
+                        @click.prevent="outWarehouse(row)"
+                        >出库</el-button
+                      >
+                      <el-button
+                        link
+                        type="primary"
+                        size="small"
+                        @click.prevent="changeGoods(row)"
+                        >调拨货品</el-button
+                      >
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination v-model:current-page="search_date.page" v-model:page-size="search_date.pageSize"
-                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_page_number" @size-change="onSizeChange" @current-change="onCurrentChange"
-                    style="margin-top: 5px; justify-content: end" />
+                  <el-pagination
+                    v-model:current-page="search_date.page"
+                    v-model:page-size="search_date.pageSize"
+                    :page-sizes="[10, 20, 50]"
+                    :background="true"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_page_number"
+                    @size-change="onSizeChange"
+                    @current-change="onCurrentChange"
+                    style="margin-top: 5px; justify-content: end"
+                  />
                 </div>
               </section>
               <el-dialog v-model="inWarehouseVisible" width="300">
@@ -507,29 +566,69 @@ const warehouse_toggle = (id: number) => {
             <div class="ledger-box">
               <form class="input-form">
                 <el-form-item label="台账生成时间">
-                  <el-date-picker type="date" placeholder="请选择台账生成时间" v-model="search_bill.day"
-                    value-format="YYYY-MM-DD" clearable style="width: 200px" />
+                  <el-date-picker
+                    type="date"
+                    placeholder="请选择台账生成时间"
+                    v-model="search_bill.day"
+                    value-format="YYYY-MM-DD"
+                    clearable
+                    style="width: 200px"
+                  />
                 </el-form-item>
                 <div class="button" @click="queryBill">查询</div>
               </form>
               <section class="table-box ledger">
-                <el-table ref="multipleTableRef" :data="billList" table-layout="auto" v-loading="load">
-                  <el-table-column prop="time" label="日期" align="center" width="150" />
-                  <el-table-column prop="name" label="货品名称" align="center" width="150" />
-                  <el-table-column prop="number" label="变动" align="center" width="80" />
+                <el-table
+                  ref="multipleTableRef"
+                  :data="billList"
+                  table-layout="auto"
+                  v-loading="load"
+                >
+                  <el-table-column
+                    prop="time"
+                    label="日期"
+                    align="center"
+                    width="150"
+                  />
+                  <el-table-column
+                    prop="name"
+                    label="货品名称"
+                    align="center"
+                    width="150"
+                  />
+                  <el-table-column
+                    prop="number"
+                    label="变动"
+                    align="center"
+                    width="80"
+                  />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button v-if="row.operator === 1" type="primary" size="small"
-                        @click.prevent="revoke(row)">撤销</el-button>
-                      <el-button v-else type="primary" size="small" disabled>撤销</el-button>
+                      <el-button
+                        v-if="row.operator === 1"
+                        type="primary"
+                        size="small"
+                        @click.prevent="revoke(row)"
+                        >撤销</el-button
+                      >
+                      <el-button v-else type="primary" size="small" disabled
+                        >撤销</el-button
+                      >
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination v-model:current-page="search_bill.page" v-model:page-size="search_bill.pageSize"
-                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_bill" @size-change="SizeChange" @current-change="CurrentChange"
-                    style="margin: 5px 0; justify-content: end; flex-wrap: wrap;" />
+                  <el-pagination
+                    v-model:current-page="search_bill.page"
+                    v-model:page-size="search_bill.pageSize"
+                    :page-sizes="[10, 20, 50]"
+                    :background="true"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_bill"
+                    @size-change="SizeChange"
+                    @current-change="CurrentChange"
+                    style="margin: 5px 0; justify-content: end; flex-wrap: wrap"
+                  />
                 </div>
               </section>
             </div>

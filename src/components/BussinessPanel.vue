@@ -38,6 +38,7 @@ const rules = {
   job: [{ required: true, message: "请选择工作", trigger: "blur" }],
 };
 const Submit = async () => {
+  await ruleFormRef.value.validate();
   if (formInline.value.gender === "男") {
     formInline.value.gender = "1";
   } else if (formInline.value.gender === "女") {

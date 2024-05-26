@@ -95,6 +95,7 @@ const clearForm = () => {
 };
 defineExpose({
   clearForm,
+  ruleFormRef,
 });
 getGoods();
 </script>
