@@ -4,12 +4,12 @@ export const bussinessStaffGetService = (params: object) => {
     params,
   });
 };
-export const bussinessStaffPostService = (data) => {
+export const bussinessStaffPostService = (data: any) => {
   return request.post("/emps", data);
 };
-export const bussinessStaffPutService = (data) => {
+export const bussinessStaffPutService = (data: any) => {
   return request.put("/emps", data);
 };
-export const bussinessStaffDeleteService = (ids) => {
+export const bussinessStaffDeleteService = (ids: any) => {
   return request.delete(`/emps/${ids}`);
 };
