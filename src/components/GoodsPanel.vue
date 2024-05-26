@@ -292,6 +292,7 @@ const onSubmit = async () => {
   box-shadow: 0 0 4px rgba(49, 61, 68, 0.5);
   text-align: center;
   line-height: 35px;
+  user-select: none;
 
   &:hover {
     scale: 1.03;

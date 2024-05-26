@@ -296,6 +296,7 @@ onMounted(() => {
     gap: 20px;
 
     .button {
+      user-select: none;
       min-width: 100px;
       padding: 0 10px;
       height: 35px;
