@@ -196,7 +196,6 @@ const billGet = async () => {
 //获取货品信息
 const goodsGet = async () => {
   loading.value = true;
-  console.log(menu.warehouse.number);
   const res = await warehouseGetService(search_date.value);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
@@ -231,7 +230,7 @@ const addGoods = () => {
 };
 //新增货品
 const onSubmit = async () => {
-  await warehousePanel.ruleFormRef.validate();
+  await warehousePanel.value.ruleFormRef.validate();
   if (Number(formInline.number) > 0) {
     const res = await warehousePostService(formInline);
     if (res.data.msg === "success") {
