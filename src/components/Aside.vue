@@ -2,8 +2,8 @@
 import { getPermission } from "@/api/login";
 import { useMenuStore } from "@/stores/menuData";
 import { tokenStore } from "@/stores/tokenData";
-import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { ref } from "vue";
 let { title, asideList_id, warehouse, aside_list } = useMenuStore();
 
 const router = useRouter();
