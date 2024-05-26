@@ -178,6 +178,7 @@ const tableTitle = [
 //获取所有的台账
 const billGet = async () => {
   load.value = true;
+  console.log(search_bill.value);
   const res = await billGetService(search_bill.value);
   total_bill.value = res.data.data.total;
   billList.value = res.data.data.rows;
@@ -202,6 +203,7 @@ const goodsGet = async () => {
 };
 //获取仓库信息
 const countList = async () => {
+  console.log(1111);
   const res = await warehouseCountGetService(warehouse.number);
   goodsCountList.value = res.data.data;
   for (let i = 0; i < goodsCountList.value.length; ++i) {
@@ -381,7 +383,11 @@ const warehouse_toggle = (id: number) => {
   warehouse.active_list[id] = "active";
   warehouse.number = Warehouse.WarehouseList[id].code;
   warehouse.name = Warehouse.WarehouseList[id].name;
-  location.reload();
+  title.second = warehouse.name;
+  console.log(1111);
+  goodsGet();
+  countList();
+  billGet();
 };
 </script>
 
