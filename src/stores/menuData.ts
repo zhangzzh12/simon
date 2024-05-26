@@ -18,7 +18,7 @@ export const useMenuStore = defineStore(
 
     const asideList_id = ref(["active", "", "", "", "", "", "", ""]);
 
-    const warehouse = reactive({
+    const warehouse = ref({
       active_list: ["active", "", ""],
       number: 0,
       name: "店铺",

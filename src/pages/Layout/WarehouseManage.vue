@@ -20,8 +20,8 @@ import InwarehousePanel from "@/components/InwarehousePanel.vue";
 import { useWareDataStore } from "@/stores/WarehouseData";
 import { formatTime, format } from "@/utils/format.ts";
 const { formInline, Warehouse } = useWareDataStore();
-const useWareData = useWareDataStore();
-const { title, warehouse } = useMenuStore();
+const { title } = useMenuStore();
+const menu = useMenuStore();
 const num = ref(0);
 const billList = ref();
 const billlist = ref();
@@ -142,19 +142,19 @@ const mergedData = ref([
 const search_date = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: warehouse.number,
+  warehouseNum: menu.warehouse.number,
   name: "",
   kind: "",
 });
 const search_bill = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: warehouse.number,
+  warehouseNum: menu.warehouse.number,
   day: "",
 });
 const bill = ref({
   id: "",
-  location: warehouse.number,
+  location: menu.warehouse.number,
   code: "",
   number: "",
   name: "",
@@ -163,7 +163,7 @@ const bill = ref({
 });
 const submitBill = ref({
   id: "",
-  location: warehouse.number,
+  location: menu.warehouse.number,
   code: "",
   number: 0,
   name: "",
@@ -195,6 +195,7 @@ const billGet = async () => {
 //获取货品信息
 const goodsGet = async () => {
   loading.value = true;
+  console.log(menu.warehouse.number);
   const res = await warehouseGetService(search_date.value);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
@@ -202,7 +203,7 @@ const goodsGet = async () => {
 };
 //获取仓库信息
 const countList = async () => {
-  const res = await warehouseCountGetService(warehouse.number);
+  const res = await warehouseCountGetService(menu.warehouse.number);
   goodsCountList.value = res.data.data;
   for (let i = 0; i < goodsCountList.value.length; ++i) {
     mergedData.value[i].value = goodsCountList.value[i];
@@ -221,7 +222,7 @@ const addGoods = () => {
   formInline.name = "";
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = "";
   formInline.number = "";
   dialogVisible.value = true;
@@ -248,7 +249,7 @@ const inWarehouse = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   inWarehouseVisible.value = true;
@@ -271,11 +272,10 @@ const outWarehouse = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   num.value = row.number;
-  useWareData.houseNumber = row.number;
   outWarehouseVisible.value = true;
 };
 const outWarehouseOperation = async () => {
@@ -299,7 +299,7 @@ const changeGoods = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   formInline.nextLocation = "";
@@ -367,7 +367,7 @@ const revoke = async (row) => {
 //面包屑
 onMounted(() => {
   title.first = "仓库管理";
-  title.second = warehouse.name;
+  title.second = menu.warehouse.name;
   goodsGet();
   countList();
   billGet();
@@ -375,13 +375,22 @@ onMounted(() => {
 });
 
 const warehouse_toggle = (id: number) => {
-  for (let i = 0; i < warehouse.active_list.length; ++i) {
-    warehouse.active_list[i] = "";
+  for (let i = 0; i < menu.warehouse.active_list.length; ++i) {
+    menu.warehouse.active_list[i] = "";
   }
-  warehouse.active_list[id] = "active";
-  warehouse.number = Warehouse.WarehouseList[id].code;
-  warehouse.name = Warehouse.WarehouseList[id].name;
-  location.reload();
+  menu.warehouse.active_list[id] = "active";
+  menu.warehouse.number = Warehouse.WarehouseList[id].code;
+  menu.warehouse.name = Warehouse.WarehouseList[id].name;
+  title.second = menu.warehouse.name;
+  //
+  search_date.value.warehouseNum = menu.warehouse.number;
+  search_bill.value.warehouseNum = menu.warehouse.number;
+  bill.value.location = menu.warehouse.number;
+  submitBill.value.location = menu.warehouse.number;
+  //
+  goodsGet();
+  countList();
+  billGet();
 };
 </script>
 
@@ -397,12 +406,8 @@ const warehouse_toggle = (id: number) => {
                   <div class="box">
                     <div class="warehouse-list">
                       <h3>店铺/仓库列表</h3>
-                      <div
-                        class="warehouse-btn"
-                        v-for="(item, index) in Warehouse.WarehouseList"
-                        @click="warehouse_toggle(index)"
-                        :class="warehouse.active_list[index]"
-                      >
+                      <div class="warehouse-btn" v-for="(item, index) in Warehouse.WarehouseList"
+                        @click="warehouse_toggle(index)" :class="menu.warehouse.active_list[index]">
                         {{ item.name }}
                       </div>
                     </div>
@@ -412,11 +417,7 @@ const warehouse_toggle = (id: number) => {
               <el-col :span="20">
                 <div class="grid-content">
                   <div class="box">
-                    <BarChart
-                      chartTitle="仓位速览"
-                      :xAxis="goodsName"
-                      :chartData="mergedData"
-                    />
+                    <BarChart chartTitle="仓位速览" :xAxis="goodsName" :chartData="mergedData" />
                   </div>
                 </div>
               </el-col>
@@ -427,27 +428,13 @@ const warehouse_toggle = (id: number) => {
               <form class="input-form">
                 <div class="input-box">
                   <span>货品名称</span>
-                  <el-input
-                    v-model="search_date.name"
-                    placeholder="请输入货品名称"
-                    style="width: 150px"
-                    clearable
-                  />
+                  <el-input v-model="search_date.name" placeholder="请输入货品名称" style="width: 150px" clearable />
                 </div>
                 <div class="input-box">
                   <span>种类</span>
-                  <el-select
-                    v-model="search_date.kind"
-                    placeholder="请选择"
-                    style="width: 100px"
-                  >
-                    <el-option
-                      v-for="goods in goodsKind"
-                      style="margin-left: 10px"
-                      :value="goods.id"
-                      :key="goods.id"
-                      :label="goods.name"
-                    >
+                  <el-select v-model="search_date.kind" placeholder="请选择" style="width: 100px">
+                    <el-option v-for="goods in goodsKind" style="margin-left: 10px" :value="goods.id" :key="goods.id"
+                      :label="goods.name">
                     </el-option>
                   </el-select>
                 </div>
@@ -457,55 +444,21 @@ const warehouse_toggle = (id: number) => {
                 <div class="button" @click="addGoods">+ 新增货品</div>
               </section>
               <section class="table-box">
-                <el-table
-                  ref="multipleTableRef"
-                  :data="tableData"
-                  table-layout="auto"
-                  v-loading="loading"
-                >
-                  <el-table-column
-                    v-for="item in tableTitle"
-                    :prop="item.props"
-                    :label="item.label"
-                    align="center"
-                  />
+                <el-table ref="multipleTableRef" :data="tableData" table-layout="auto" v-loading="loading">
+                  <el-table-column v-for="item in tableTitle" :prop="item.props" :label="item.label" align="center" />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button
-                        type="primary"
-                        size="small"
-                        @click.prevent="inWarehouse(row)"
-                        >入库</el-button
-                      >
-                      <el-button
-                        link
-                        type="primary"
-                        size="small"
-                        @click.prevent="outWarehouse(row)"
-                        >出库</el-button
-                      >
-                      <el-button
-                        link
-                        type="primary"
-                        size="small"
-                        @click.prevent="changeGoods(row)"
-                        >调拨货品</el-button
-                      >
+                      <el-button type="primary" size="small" @click.prevent="inWarehouse(row)">入库</el-button>
+                      <el-button link type="primary" size="small" @click.prevent="outWarehouse(row)">出库</el-button>
+                      <el-button link type="primary" size="small" @click.prevent="changeGoods(row)">调拨货品</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination
-                    v-model:current-page="search_date.page"
-                    v-model:page-size="search_date.pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :background="true"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_page_number"
-                    @size-change="onSizeChange"
-                    @current-change="onCurrentChange"
-                    style="margin-top: 5px; justify-content: end"
-                  />
+                  <el-pagination v-model:current-page="search_date.page" v-model:page-size="search_date.pageSize"
+                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_page_number" @size-change="onSizeChange" @current-change="onCurrentChange"
+                    style="margin-top: 5px; justify-content: end" />
                 </div>
               </section>
               <el-dialog v-model="inWarehouseVisible" width="300">
@@ -566,69 +519,29 @@ const warehouse_toggle = (id: number) => {
             <div class="ledger-box">
               <form class="input-form">
                 <el-form-item label="台账生成时间">
-                  <el-date-picker
-                    type="date"
-                    placeholder="请选择台账生成时间"
-                    v-model="search_bill.day"
-                    value-format="YYYY-MM-DD"
-                    clearable
-                    style="width: 200px"
-                  />
+                  <el-date-picker type="date" placeholder="请选择台账生成时间" v-model="search_bill.day"
+                    value-format="YYYY-MM-DD" clearable style="width: 200px" />
                 </el-form-item>
                 <div class="button" @click="queryBill">查询</div>
               </form>
               <section class="table-box ledger">
-                <el-table
-                  ref="multipleTableRef"
-                  :data="billList"
-                  table-layout="auto"
-                  v-loading="load"
-                >
-                  <el-table-column
-                    prop="time"
-                    label="日期"
-                    align="center"
-                    width="150"
-                  />
-                  <el-table-column
-                    prop="name"
-                    label="货品名称"
-                    align="center"
-                    width="150"
-                  />
-                  <el-table-column
-                    prop="number"
-                    label="变动"
-                    align="center"
-                    width="80"
-                  />
+                <el-table ref="multipleTableRef" :data="billList" table-layout="auto" v-loading="load">
+                  <el-table-column prop="time" label="日期" align="center" width="150" />
+                  <el-table-column prop="name" label="货品名称" align="center" width="150" />
+                  <el-table-column prop="number" label="变动" align="center" width="80" />
                   <el-table-column label="操作" align="center">
                     <template #default="{ row }">
-                      <el-button
-                        v-if="row.operator === 1"
-                        type="primary"
-                        size="small"
-                        @click.prevent="revoke(row)"
-                        >撤销</el-button
-                      >
-                      <el-button v-else type="primary" size="small" disabled
-                        >撤销</el-button
-                      >
+                      <el-button v-if="row.operator === 1" type="primary" size="small"
+                        @click.prevent="revoke(row)">撤销</el-button>
+                      <el-button v-else type="primary" size="small" disabled>撤销</el-button>
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="page-box">
-                  <el-pagination
-                    v-model:current-page="search_bill.page"
-                    v-model:page-size="search_bill.pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :background="true"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    :total="total_bill"
-                    @size-change="SizeChange"
-                    @current-change="CurrentChange"
-                    style="margin: 5px 0; justify-content: end; flex-wrap: wrap"
-                  />
+                  <el-pagination v-model:current-page="search_bill.page" v-model:page-size="search_bill.pageSize"
+                    :page-sizes="[10, 20, 50]" :background="true" layout="total, sizes, prev, pager, next, jumper"
+                    :total="total_bill" @size-change="SizeChange" @current-change="CurrentChange"
+                    style="margin: 5px 0; justify-content: end; flex-wrap: wrap" />
                 </div>
               </section>
             </div>
