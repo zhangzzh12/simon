@@ -20,8 +20,8 @@ import InwarehousePanel from "@/components/InwarehousePanel.vue";
 import { useWareDataStore } from "@/stores/WarehouseData";
 import { formatTime, format } from "@/utils/format.ts";
 const { formInline, Warehouse } = useWareDataStore();
-const useWareData = useWareDataStore();
-const { title, warehouse } = useMenuStore();
+const { title } = useMenuStore();
+const menu = useMenuStore();
 const num = ref(0);
 const billList = ref();
 const billlist = ref();
@@ -142,19 +142,19 @@ const mergedData = ref([
 const search_date = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: warehouse.number,
+  warehouseNum: menu.warehouse.number,
   name: "",
   kind: "",
 });
 const search_bill = ref({
   page: 1,
   pageSize: 10,
-  warehouseNum: warehouse.number,
+  warehouseNum: menu.warehouse.number,
   day: "",
 });
 const bill = ref({
   id: "",
-  location: warehouse.number,
+  location: menu.warehouse.number,
   code: "",
   number: "",
   name: "",
@@ -163,7 +163,7 @@ const bill = ref({
 });
 const submitBill = ref({
   id: "",
-  location: warehouse.number,
+  location: menu.warehouse.number,
   code: "",
   number: 0,
   name: "",
@@ -196,6 +196,7 @@ const billGet = async () => {
 //获取货品信息
 const goodsGet = async () => {
   loading.value = true;
+  console.log(menu.warehouse.number);
   const res = await warehouseGetService(search_date.value);
   total_page_number.value = res.data.data.total;
   tableData.value = res.data.data.rows;
@@ -203,8 +204,7 @@ const goodsGet = async () => {
 };
 //获取仓库信息
 const countList = async () => {
-  console.log(1111);
-  const res = await warehouseCountGetService(warehouse.number);
+  const res = await warehouseCountGetService(menu.warehouse.number);
   goodsCountList.value = res.data.data;
   for (let i = 0; i < goodsCountList.value.length; ++i) {
     mergedData.value[i].value = goodsCountList.value[i];
@@ -223,7 +223,7 @@ const addGoods = () => {
   formInline.name = "";
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = "";
   formInline.number = "";
   dialogVisible.value = true;
@@ -250,7 +250,7 @@ const inWarehouse = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   inWarehouseVisible.value = true;
@@ -273,11 +273,10 @@ const outWarehouse = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   num.value = row.number;
-  useWareData.houseNumber = row.number;
   outWarehouseVisible.value = true;
 };
 const outWarehouseOperation = async () => {
@@ -301,7 +300,7 @@ const changeGoods = (row: any) => {
   formInline.name = row.name;
   formInline.inPrice = "";
   formInline.kind = "";
-  formInline.location = warehouse.number;
+  formInline.location = menu.warehouse.number;
   formInline.code = row.code;
   formInline.number = "";
   formInline.nextLocation = "";
@@ -369,7 +368,7 @@ const revoke = async (row) => {
 //面包屑
 onMounted(() => {
   title.first = "仓库管理";
-  title.second = warehouse.name;
+  title.second = menu.warehouse.name;
   goodsGet();
   countList();
   billGet();
@@ -377,14 +376,19 @@ onMounted(() => {
 });
 
 const warehouse_toggle = (id: number) => {
-  for (let i = 0; i < warehouse.active_list.length; ++i) {
-    warehouse.active_list[i] = "";
+  for (let i = 0; i < menu.warehouse.active_list.length; ++i) {
+    menu.warehouse.active_list[i] = "";
   }
-  warehouse.active_list[id] = "active";
-  warehouse.number = Warehouse.WarehouseList[id].code;
-  warehouse.name = Warehouse.WarehouseList[id].name;
-  title.second = warehouse.name;
-  console.log(1111);
+  menu.warehouse.active_list[id] = "active";
+  menu.warehouse.number = Warehouse.WarehouseList[id].code;
+  menu.warehouse.name = Warehouse.WarehouseList[id].name;
+  title.second = menu.warehouse.name;
+  //
+  search_date.value.warehouseNum = menu.warehouse.number;
+  search_bill.value.warehouseNum = menu.warehouse.number;
+  bill.value.location = menu.warehouse.number;
+  submitBill.value.location = menu.warehouse.number;
+  //
   goodsGet();
   countList();
   billGet();
@@ -407,7 +411,7 @@ const warehouse_toggle = (id: number) => {
                         class="warehouse-btn"
                         v-for="(item, index) in Warehouse.WarehouseList"
                         @click="warehouse_toggle(index)"
-                        :class="warehouse.active_list[index]"
+                        :class="menu.warehouse.active_list[index]"
                       >
                         {{ item.name }}
                       </div>
