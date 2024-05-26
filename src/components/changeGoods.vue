@@ -24,13 +24,20 @@ const rules = {
     :rules="rules"
   >
     <el-form-item label="货品名称">
-      <el-input v-model="formInline.name"> </el-input>
+      <el-input
+        v-model="formInline.name"
+        v-if="formInline.id !== ''"
+        disabled
+      ></el-input>
+      <el-input v-model="formInline.name" v-else></el-input>
     </el-form-item>
     <el-form-item label="货品数量" prop="number">
       <el-input v-model="formInline.number"> </el-input>
     </el-form-item>
     <el-form-item label="货品编号">
-      <el-input v-model="formInline.code"> </el-input>
+      <el-input v-if="formInline.id !== ''" v-model="formInline.code" disabled>
+      </el-input>
+      <el-input v-else v-model="formInline.code"> </el-input>
     </el-form-item>
     <el-form-item label="调拨到的仓库">
       <el-select v-model="formInline.nextLocation" placeholder="请选择">

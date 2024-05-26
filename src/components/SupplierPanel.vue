@@ -88,6 +88,7 @@ const findByName = (name) => {
   return kind ? kind.id : "";
 };
 const Submit = async () => {
+  await ruleFormRef.value.validate();
   formInline.value.kind = findByName(formInline.value.kind);
   if (formInline.value.id) {
     await supplierPutService(formInline.value);
